@@ -13,6 +13,13 @@ class MySQL
     String.new LibMySQL.error(@handle)
   end
 
+  def escape_string(original)
+    # NOTE: This is how you create a new pointer!
+    new = Pointer(UInt8).malloc(0)
+    LibMySQL.escape_string(@handle, new, original, original.length.to_u32)
+    String.new(new)
+  end
+
   def connect(host, user, pass, db, port, socket, flags = 0_u32)
     handle = LibMySQL.real_connect(@handle, host, user, pass, db, port, socket,
                                    flags)
@@ -36,3 +43,8 @@ db.connect("localhost", # Host
            "test",      # Database
            3306_u16,    # Port number
            nil)         # Socket
+
+
+puts "Escaping string 'whatever'"
+result = db.escape_string("whatever")
+puts "Escaped string is #{result}"
