@@ -1,5 +1,4 @@
-
-require "lib_mysql"
+require "../ext/mysql"
 
 class MySQL
   def initialize
