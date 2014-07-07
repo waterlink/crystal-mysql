@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-lib LibMySQL("MySQL")
+lib LibMySQL("mysqlclient_r")
   struct MySQL
     # Look inside the file:
     #
@@ -32,9 +32,11 @@ lib LibMySQL("MySQL")
   # engine running on host. mysql_real_connect() must complete successfully before
   # you can execute any other API functions that require a valid MYSQL connection
   # handle structure.
-
-
-  # * db is the database name. If db is not NULL, the connection sets the default database to this value.
+  #
+  # Arguments:
+  #
+  # * db is the database name. If db is not NULL, the connection sets the default
+  # database to this value.
   # * If port is not 0, the value is used as the port number for the TCP/IP
   # connection. Note that the host parameter determines the type of the connection.
   # * If unix_socket is not NULL, the string specifies the socket or named pipe to
@@ -43,13 +45,13 @@ lib LibMySQL("MySQL")
   # following flags to enable certain features.
 
   fun real_connect = mysql_real_connect(mysql       : MySQL*,
-                                         host        : UInt8*,
-                                         user        : UInt8*,
-                                         passwd      : UInt8*,
-                                         db          : UInt8*,
-                                         port        : UInt16,
-                                         unix_socket : UInt8*,
-                                         client_flag : UInt32) : MySQL*
+                                        host        : UInt8*,
+                                        user        : UInt8*,
+                                        passwd      : UInt8*,
+                                        db          : UInt8*,
+                                        port        : UInt16,
+                                        unix_socket : UInt8*,
+                                        client_flag : UInt32) : MySQL*
 
 
   # Returns a string that represents the MySQL client library version;
@@ -57,6 +59,13 @@ lib LibMySQL("MySQL")
 
   fun client_info  = mysql_get_client_info() : UInt8*
 
+
+  # For the connection specified by mysql, mysql_error() returns a null-terminated
+  # string containing the error message for the most recently invoked API function
+  # that failed. If a function did not fail, the return value of mysql_error() may
+  # be the previous error or an empty string to indicate no error.
+
+  fun error        = mysql_error(mysql : MySQL*) : UInt8*
 
   # Executes the SQL statement pointed to by the null-terminated string stmt_str.
   # Normally, the string must consist of a single SQL statement without a
@@ -66,8 +75,6 @@ lib LibMySQL("MySQL")
   # Zero for success. Nonzero if an error occurred.
 
   fun query        = mysql_query(mysql : MySQL*, stmt_str : UInt8*) : Int16
-
-
 
   # Closes a previously opened connection. mysql_close() also deallocates
   # the connection handle pointed to by mysql if the handle was allocated
