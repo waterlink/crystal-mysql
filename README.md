@@ -1,6 +1,8 @@
 
 # crystal-mysql
 
+Fork of https://github.com/farleyknight/crystal-mysql
+
 Basic MySQL bindings for Crystal.
 
 # MySQL's C API
