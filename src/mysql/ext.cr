@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-lib LibMySQL("mysqlclient_r")
+@[Link("mysqlclient_r")]
+lib LibMySQL
   struct MySQL
     # Look inside the file:
     #

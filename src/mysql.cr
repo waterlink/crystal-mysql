@@ -1,7 +1,7 @@
 require "./mysql/*"
 
 class MySQL
-  class ConnectionError < StandardError; end
+  class ConnectionError < Exception; end
 
   def initialize
     @handle = LibMySQL.init(nil)
