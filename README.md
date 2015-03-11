@@ -1,5 +1,6 @@
-
 # crystal-mysql
+
+[![Build Status](https://travis-ci.org/waterlink/crystal-mysql.svg?branch=master)](https://travis-ci.org/waterlink/crystal-mysql)
 
 Fork of https://github.com/farleyknight/crystal-mysql
 
