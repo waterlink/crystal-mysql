@@ -41,4 +41,20 @@ describe MySQL do
       subject.call.escape_string("'; DROP TABLE users; --").should eq("\\'; DROP TABLE users; --")
     end
   end
+
+  describe "#connect" do
+    it "fails with MySQL::ConnectionError when unable to connect" do
+      begin
+        subject.call.connect("127.0.0.1", "non-existent", "", "non-existent", 1234_u16, nil)
+        raise Exception.new("should raise")
+      rescue e
+        e.should be_a(MySQL::ConnectionError)
+        e.message.should match(/Can't connect to MySQL server/)
+      end
+    end
+
+    it "does not fail when able to connect" do
+      subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+    end
+  end
 end
