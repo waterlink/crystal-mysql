@@ -6,15 +6,46 @@ Fork of https://github.com/farleyknight/crystal-mysql
 
 Basic MySQL bindings for Crystal.
 
-# MySQL's C API
+## Usage
 
-| C Function            | Crystal Function      | Implemented? | Tested? |
-|-----------------------|-----------------------|--------------|---------|
-| mysql_init            | LibMySQL.init         | Yes          | Yes     |
-| mysql_real_connect    | LibMySQL.real_connect | Yes          | Yes     |
-| mysql_get_client_info | LibMySQL.client_info  | Yes          | Yes     |
-| mysql_get_host_info   | LibMySQL.host_info    | No           | No      |
-| mysql_commit          | LibMySQL.commit       | No           | No      |
-| mysql_error           | LibMySQL.error        | Yes          | Yes     |
-| mysql_query           | LibMySQL.query        | Yes          | No      |
-| mysql_close           | LibMySQL.close        | Yes          | No      |
+*No usage yet, since basic high level APIs are not yet implemented (such as `#query`)*
+
+## High-level API roadmap
+
+| High level method     | Implemented? |
+|-----------------------|--------------|
+| MySQL#initialize      | Yes          |
+| MySQL#client_info     | Yes          |
+| MySQL#error           | Yes          |
+| MySQL#escape_string   | Yes          |
+| MySQL#connect         | Yes          |
+| MySQL#host_info       | No           |
+| MySQL#query           | No           |
+| MySQL#transaction     | No           |
+| MySQL#close           | No           |
+
+## Low-level API roadmap
+
+| C Function            | Crystal Function      | Implemented? |
+|-----------------------|-----------------------|--------------|
+| mysql_init            | LibMySQL.init         | Yes          |
+| mysql_real_connect    | LibMySQL.real_connect | Yes          |
+| mysql_get_client_info | LibMySQL.client_info  | Yes          |
+| mysql_get_host_info   | LibMySQL.host_info    | No           |
+| mysql_commit          | LibMySQL.commit       | No           |
+| mysql_error           | LibMySQL.error        | Yes          |
+| mysql_query           | LibMySQL.query        | Yes          |
+| mysql_close           | LibMySQL.close        | Yes          |
+
+## Contributing
+
+1. Fork it ( https://github.com/waterlink/crystal-mysql/fork )
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create a new Pull Request
+
+## Contributors
+
+- [waterlink](https://github.com/waterlink) - maintainer
+- [farleyknight](https://github.com/farleyknight) - original idea
