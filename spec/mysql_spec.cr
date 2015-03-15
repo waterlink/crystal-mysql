@@ -20,4 +20,19 @@ describe MySQL do
       subject.call.client_info.should match(%r{^\d+\.\d+\.\d+$})
     end
   end
+
+  describe "#error" do
+    it "returns empty string when everything is ok" do
+      subject.call.error.should eq("")
+    end
+
+    it "returns an error when unable to connect" do
+      mysql = subject.call
+      begin
+        mysql.connect("127.0.0.1", "non-existent", "", "non-existent", 1234_u16, nil)
+      rescue
+      end
+      mysql.error.should match(/Can't connect to MySQL server/)
+    end
+  end
 end
