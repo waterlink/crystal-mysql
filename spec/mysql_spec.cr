@@ -35,4 +35,10 @@ describe MySQL do
       mysql.error.should match(/Can't connect to MySQL server/)
     end
   end
+
+  describe "#escape_string" do
+    it "provides protection from nasty queries" do
+      subject.call.escape_string("'; DROP TABLE users; --").should eq("\\'; DROP TABLE users; --")
+    end
+  end
 end
