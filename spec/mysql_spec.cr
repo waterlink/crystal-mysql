@@ -9,6 +9,10 @@ describe MySQL do
     described_class.call.new
   }
 
+  connected = -> {
+    subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+  }
+
   describe "#initialize & .new" do
     it "creates instance of MySQL" do
       subject.call.should be_a(MySQL)
@@ -54,7 +58,22 @@ describe MySQL do
     end
 
     it "does not fail when able to connect" do
-      subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+      connected.call
+    end
+  end
+
+  describe "#query" do
+    it "works with simple queries" do
+      connected.call.query("SELECT 1").should eq("1")
+    end
+
+    it "raises NotConnectedError when client is not connected" do
+      begin
+        subject.call.query("SELECT 1")
+        raise Exception.new("should raise")
+      rescue e
+        e.should be_a(MySQL::NotConnectedError)
+      end
     end
   end
 end

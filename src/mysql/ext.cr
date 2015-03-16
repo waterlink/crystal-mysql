@@ -17,6 +17,14 @@ lib LibMySQL
     # more info.
   end
 
+  struct MySQLRes
+    # Empty for the moment
+  end
+
+  struct MySQLRow
+    # Empty for the moment
+  end
+
   # Allocates or initializes a MYSQL object suitable for mysql_real_connect().
   #
   # If the first parameter is a NULL pointer, the function allocates,
@@ -83,6 +91,27 @@ lib LibMySQL
   # Zero for success. Nonzero if an error occurred.
 
   fun query         = mysql_query(mysql : MySQL*, stmt_str : UInt8*) : Int16
+
+  # After invoking mysql_query() or mysql_real_query(), you must call
+  # mysql_store_result() or mysql_use_result() for every statement
+  # that successfully produces a result set (SELECT, SHOW, DESCRIBE,
+  # EXPLAIN, CHECK TABLE, and so forth). You must also call
+  # mysql_free_result() after you are done with the result set.
+  # Return Values
+  # A MYSQL_RES result structure with the results. NULL (0) if an error occurred.
+
+  fun store_result = mysql_store_result(mysql : MySQL*) : MySQLRes*
+
+  # Retrieves the next row of a result set. When used after
+  # mysql_store_result(), mysql_fetch_row() returns NULL when there
+  # are no more rows to retrieve. When used after mysql_use_result(),
+  # mysql_fetch_row() returns NULL when there are no more rows to
+  # retrieve or if an error occurred.
+  # Return values
+  # A MYSQL_ROW structure for the next row. NULL if there are no more
+  # rows to retrieve or if an error occurred.
+
+  fun fetch_row = mysql_fetch_row(mysql_result : MySQLRes*) : MySQLRow*
 
   # Closes a previously opened connection. mysql_close() also deallocates
   # the connection handle pointed to by mysql if the handle was allocated

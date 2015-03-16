@@ -1,10 +1,13 @@
 require "./mysql/*"
 
 class MySQL
-  class ConnectionError < Exception; end
+  class Error < Exception; end
+  class ConnectionError < Error; end
+  class NotConnectedError < Error; end
 
   def initialize
     @handle = LibMySQL.init(nil)
+    @connected = false
   end
 
   def client_info
@@ -26,11 +29,21 @@ class MySQL
     handle = LibMySQL.real_connect(@handle, host, user, pass, db, port, socket,
                                    flags)
     if handle == @handle
-      true
+      @connected = true
     elsif handle.nil?
       raise ConnectionError.new(error)
     else
       raise ConnectionError.new("Unreachable code")
     end
+
+    self
+  end
+
+  def query(query_string)
+    unless @connected
+      raise NotConnectedError.new
+    end
+
+    LibMySQL.query(@handle, query_string)
   end
 end
