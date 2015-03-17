@@ -21,8 +21,34 @@ lib LibMySQL
     # Empty for the moment
   end
 
-  struct MySQLRow
-    # Empty for the moment
+  alias MySQLString = UInt8*
+  alias MySQLRow = MySQLString
+
+  struct MySQLField
+    name: MySQLString
+    org_name: MySQLString
+    table: MySQLString
+    org_table: MySQLString
+    db: MySQLString
+    catalog: MySQLString
+    def: MySQLString
+
+    length: UInt32
+    max_length: UInt32
+
+    name_length: UInt32
+    org_name_length: UInt32
+    table_length: UInt32
+    org_table_length: UInt32
+    db_length: UInt32
+    catalog_length: UInt32
+    def_length: UInt32
+
+    flags: UInt16
+
+    decimals: UInt16
+
+    charsetnr: UInt16
   end
 
   # Allocates or initializes a MYSQL object suitable for mysql_real_connect().
@@ -112,6 +138,26 @@ lib LibMySQL
   # rows to retrieve or if an error occurred.
 
   fun fetch_row = mysql_fetch_row(mysql_result : MySQLRes*) : MySQLRow*
+
+  # Returns the number of columns in a result set.
+
+  fun num_fields = mysql_num_fields(mysql_result : MySQLRes*) : UInt16
+
+  # Returns the lengths of the columns of the current row within a
+  # result set. If you plan to copy field values, this length
+  # information is also useful for optimization, because you can avoid
+  # calling strlen(). In addition, if the result set contains binary
+  # data, you must use this function to determine the size of the
+  # data, because strlen() returns incorrect results for any field
+  # containing null characters.
+
+  fun fetch_lengths = mysql_fetch_lengths(mysql_result : MySQLRes*) : UInt32*
+
+  # Returns an array of all MYSQL_FIELD structures for a result
+  # set. Each structure provides the field definition for one column
+  # of the result set.
+
+  fun fetch_fields = mysql_fetch_fields(mysql_result : MySQLRes*) : MySQLField*
 
   # Closes a previously opened connection. mysql_close() also deallocates
   # the connection handle pointed to by mysql if the handle was allocated

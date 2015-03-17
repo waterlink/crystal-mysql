@@ -64,7 +64,7 @@ describe MySQL do
 
   describe "#query" do
     it "works with simple queries" do
-      connected.call.query("SELECT 1").should eq("1")
+      connected.call.query("SELECT 1").should eq([["1"]])
     end
 
     it "raises NotConnectedError when client is not connected" do
