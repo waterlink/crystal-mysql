@@ -24,6 +24,31 @@ lib LibMySQL
   alias MySQLString = UInt8*
   alias MySQLRow = MySQLString
 
+  enum MySQLFieldType
+    MYSQL_TYPE_TINY
+    MYSQL_TYPE_SHORT
+    MYSQL_TYPE_LONG
+    MYSQL_TYPE_INT24
+    MYSQL_TYPE_LONGLONG
+    MYSQL_TYPE_DECIMAL
+    MYSQL_TYPE_NEWDECIMAL
+    MYSQL_TYPE_FLOAT
+    MYSQL_TYPE_DOUBLE
+    MYSQL_TYPE_BIT
+    MYSQL_TYPE_TIMESTAMP
+    MYSQL_TYPE_DATE
+    MYSQL_TYPE_TIME
+    MYSQL_TYPE_DATETIME
+    MYSQL_TYPE_YEAR
+    MYSQL_TYPE_STRING
+    MYSQL_TYPE_VAR_STRING
+    MYSQL_TYPE_BLOB
+    MYSQL_TYPE_SET
+    MYSQL_TYPE_ENUM
+    MYSQL_TYPE_GEOMETRY
+    MYSQL_TYPE_NULL
+  end
+
   struct MySQLField
     name: MySQLString
     org_name: MySQLString
@@ -36,19 +61,21 @@ lib LibMySQL
     length: UInt32
     max_length: UInt32
 
-    name_length: UInt32
-    org_name_length: UInt32
-    table_length: UInt32
-    org_table_length: UInt32
-    db_length: UInt32
-    catalog_length: UInt32
-    def_length: UInt32
+    name_length: UInt16
+    org_name_length: UInt16
+    table_length: UInt16
+    org_table_length: UInt16
+    db_length: UInt16
+    catalog_length: UInt16
+    def_length: UInt16
 
     flags: UInt16
 
     decimals: UInt16
 
     charsetnr: UInt16
+
+    field_type: MySQLFieldType
   end
 
   # Allocates or initializes a MYSQL object suitable for mysql_real_connect().
@@ -153,11 +180,27 @@ lib LibMySQL
 
   fun fetch_lengths = mysql_fetch_lengths(mysql_result : MySQLRes*) : UInt32*
 
+  # Returns the definition of one column of a result set as a
+  # MYSQL_FIELD structure. Call this function repeatedly to retrieve
+  # information about all columns in the result
+  # set. mysql_fetch_field() returns NULL when no more fields are
+  # left.
+
+  fun fetch_field = mysql_fetch_field(mysql_result : MySQLRes*) : MySQLField*
+
   # Returns an array of all MYSQL_FIELD structures for a result
   # set. Each structure provides the field definition for one column
   # of the result set.
 
   fun fetch_fields = mysql_fetch_fields(mysql_result : MySQLRes*) : MySQLField*
+
+  # Frees the memory allocated for a result set by
+  # mysql_store_result(), mysql_use_result(), mysql_list_dbs(), and so
+  # forth. When you are done with a result set, you must free the
+  # memory it uses by calling mysql_free_result().
+  # Do not attempt to access a result set after freeing it.
+
+  fun free_result = mysql_free_result(mysql_result : MySQLRes*)
 
   # Closes a previously opened connection. mysql_close() also deallocates
   # the connection handle pointed to by mysql if the handle was allocated

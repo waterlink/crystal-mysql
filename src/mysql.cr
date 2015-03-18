@@ -54,23 +54,36 @@ class MySQL
 
     LibMySQL.query(@handle, query_string)
     result = LibMySQL.store_result(@handle)
-    num_fields = LibMySQL.num_fields(result)
 
-    rows = Array.new(1, fetch_row(result, num_fields))
+    rows = Array.new(1, fetch_row(result))
+    while row = fetch_row(result)
+      rows << row
+    end
+
+    # NOTE: Why this happens here:
+    # *** Error in `/tmp/crystal-run-spec.CAKQ1K': double free or corruption (out): 0x00000000008fa040 ***
+    #LibMySQL.free_result(result)
+
     rows
   end
 
-  private def fetch_row(result, num_fields)
+  private def fetch_row(result)
     row = LibMySQL.fetch_row(result)
+    return nil if row.nil?
+
     fields = LibMySQL.fetch_fields(result)
 
     full_len = 0
-    (0_u16...num_fields).map do |index|
-      len = fields[index].length
+    index = 0
+    row_list :: Array(String)
+    while !(field = LibMySQL.fetch_field(result)).nil?
+      len = field[0].length
       value = string_from_uint8(row[0] + full_len, len)
-      full_len += len
-      value
+      full_len += len + 1
+      index += 1
+      row_list << value
     end
+    row_list
   end
 
   private def string_from_uint8(s, len)
