@@ -71,6 +71,27 @@ describe MySQL do
       connected.call.query(%{SELECT 1, 2, 3, "hello world"}).should eq([["1", "2", "3", "hello world"]])
     end
 
+    it "works with commands" do
+      connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
+      connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
+        .should eq(nil)
+    end
+
+    it "allows to return multiple rows" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS user})
+      conn.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
+
+      conn.query(%{INSERT INTO user(id, email, name) values(1, "john@example.com", "John Smith")})
+      conn.query(%{INSERT INTO user(id, email, name) values(2, "sarah@example.com", "Sarah Smith")})
+
+      conn.query(%{SELECT * FROM user})
+        .should eq([
+                    ["1", "john@example.com", "John Smith"],
+                    ["2", "sarah@example.com", "Sarah Smith"],
+                   ])
+    end
+
     it "raises NotConnectedError when client is not connected" do
       begin
         subject.call.query("SELECT 1")

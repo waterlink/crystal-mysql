@@ -11,6 +11,7 @@ class MySQL
   class Error < Exception; end
   class ConnectionError < Error; end
   class NotConnectedError < Error; end
+  class QueryError < Error; end
 
   def initialize
     @handle = LibMySQL.init(nil)
@@ -52,11 +53,18 @@ class MySQL
       raise NotConnectedError.new
     end
 
-    LibMySQL.query(@handle, query_string)
+    code = LibMySQL.query(@handle, query_string)
+    raise QueryError.new(error) if code != 0
     result = LibMySQL.store_result(@handle)
+    return nil if result.nil?
 
-    rows = Array.new(1, fetch_row(result))
-    while row = fetch_row(result)
+    fields = [] of LibMySQL::MySQLField
+    while field = LibMySQL.fetch_field(result)
+      fields << field.value
+    end
+
+    rows = [] of Array(String)
+    while row = fetch_row(result, fields)
       rows << row
     end
 
@@ -67,26 +75,31 @@ class MySQL
     rows
   end
 
-  private def fetch_row(result)
+  def fetch_row(result, fields)
     row = LibMySQL.fetch_row(result)
     return nil if row.nil?
 
-    fields = LibMySQL.fetch_fields(result)
-
     full_len = 0
     index = 0
-    row_list :: Array(String)
-    while !(field = LibMySQL.fetch_field(result)).nil?
-      len = field[0].length
+    row_list = [] of String
+    fields.each do |field|
+      len = field.max_length
+
       value = string_from_uint8(row[0] + full_len, len)
+      if value[-1] == '\0'
+        value = value[0...-1]
+        len -= 1
+      end
+
       full_len += len + 1
       index += 1
       row_list << value
     end
+
     row_list
   end
 
-  private def string_from_uint8(s, len)
-    (0_u32...len).inject("") { |acc, i| acc + s[i].chr }
+  def string_from_uint8(s, len)
+    (0_u64...len).inject("") { |acc, i| acc + s[i].chr }
   end
 end
