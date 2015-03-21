@@ -20,7 +20,7 @@ Basic MySQL bindings for Crystal.
 | MySQL#escape_string   | Yes          |
 | MySQL#connect         | Yes          |
 | MySQL#host_info       | No           |
-| MySQL#query           | No           |
+| MySQL#query           | 60%          |
 | MySQL#transaction     | No           |
 | MySQL#close           | No           |
 
@@ -36,6 +36,13 @@ Basic MySQL bindings for Crystal.
 | mysql_error           | LibMySQL.error        | Yes          |
 | mysql_query           | LibMySQL.query        | Yes          |
 | mysql_close           | LibMySQL.close        | Yes          |
+| mysql_store_result    | LibMySQL.store_result | Yes          |
+| mysql_fetch_row       | LibMySQL.fetch_row    | Yes          |
+| mysql_num_fieldds     | LibMySQL.num_fieldds  | Yes          |
+| mysql_fetch_lengths   | LibMySQL.fetch_lengths| Yes          |
+| mysql_fetch_field     | LibMySQL.fetch_field  | Yes          |
+| mysql_fetch_fields    | LibMySQL.fetch_fields | Yes          |
+| mysql_free_result     | LibMySQL.free_result  | Yes          |
 
 ## Contributing
 
