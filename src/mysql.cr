@@ -13,10 +13,10 @@ class MySQL
   class NotConnectedError < Error; end
   class QueryError < Error; end
 
-  alias SqlTypes = String|Int32|Float64|UInt64|Nil
+  alias SqlType = String|Time|Int32|Int64|Float64|Nil
 
   struct ValueReader
-    property value :: SqlTypes
+    property value :: SqlType
     property start
 
     def initialize(@value, @start)
@@ -93,7 +93,7 @@ class MySQL
       fields << field.value
     end
 
-    rows = [] of Array(SqlTypes)
+    rows = [] of Array(SqlType)
     while row = fetch_row(result, fields)
       rows << row
     end
@@ -110,7 +110,7 @@ class MySQL
     return nil if row.nil?
 
     reader = ValueReader.new
-    row_list = [] of SqlTypes
+    row_list = [] of SqlType
     fields.each do |field|
       reader = fetch_value(field, row, reader)
       row_list << reader.value
@@ -125,6 +125,11 @@ class MySQL
     if len > 0 && value[-1] == '\0'
       value = value[0...-1]
       len -= 1
+    end
+
+    if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP ||
+        field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME
+      value = TimeFormat.new("%F %T").parse(value)
     end
 
     if INTEGER_TYPES.includes?(field.field_type)

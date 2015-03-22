@@ -71,6 +71,21 @@ describe MySQL do
       connected.call.query(%{SELECT 1, 2.5, NULL, 3, "hello world"}).should eq([[1, 2.5, nil, 3, "hello world"]])
     end
 
+    it "works with timestamp" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS event})
+      conn.query(%{CREATE TABLE event (id INT, created_at TIMESTAMP, what VARCHAR(50))})
+
+      conn.query(%{INSERT INTO event values(1, '2005-03-27 02:00:00', 'login')})
+      conn.query(%{INSERT INTO event values(2, '2005-03-27 02:02:00', 'logout')})
+
+      conn.query(%{SELECT * FROM event})
+        .should eq([
+                    [1, TimeFormat.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+                    [2, TimeFormat.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+                   ])
+    end
+
     it "works with commands" do
       connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
       connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
