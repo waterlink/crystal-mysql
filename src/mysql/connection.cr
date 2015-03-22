@@ -107,7 +107,7 @@ module MySQL
       rows
     end
 
-    def fetch_row(result, fields)
+    private def fetch_row(result, fields)
       row = LibMySQL.fetch_row(result)
       return nil if row.nil?
 
@@ -129,7 +129,7 @@ module MySQL
       row_list
     end
 
-    def fetch_value(field, source, reader, len)
+    private def fetch_value(field, source, reader, len)
       value = Support.string_from_uint8(source[0] + reader.start, len)
 
       account_for_zero = 1
