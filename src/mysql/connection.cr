@@ -130,7 +130,7 @@ module MySQL
     end
 
     def fetch_value(field, source, reader, len)
-      value = string_from_uint8(source[0] + reader.start, len)
+      value = Support.string_from_uint8(source[0] + reader.start, len)
 
       account_for_zero = 1
 
@@ -169,10 +169,6 @@ module MySQL
       reader.start += len + account_for_zero
       reader.value = parsed_value
       reader
-    end
-
-    def string_from_uint8(s, len)
-      (0_u32...len).inject("") { |acc, i| acc + s[i].chr }
     end
   end
 end
