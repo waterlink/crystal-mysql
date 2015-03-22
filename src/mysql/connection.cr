@@ -134,42 +134,10 @@ module MySQL
     private def fetch_value(field, source, reader, len)
       value = Support.string_from_uint8(source[0] + reader.start, len)
 
-      account_for_zero = 1
+      lifted = Types::Value.new(value, field).lift
 
-      parsed_value = value
-
-      if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP ||
-          field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME
-        parsed_value = TimeFormat.new("%F %T").parse(value)
-      end
-
-      if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE && value.is_a?(String)
-        parsed_value = TimeFormat.new("%F").parse(value)
-      end
-
-      if Types::INTEGER_TYPES.includes?(field.field_type)
-        parsed_value = value.to_i
-      end
-
-      if Types::FLOAT_TYPES.includes?(field.field_type)
-        parsed_value = value.to_f
-      end
-
-      if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT
-        parsed_value = 0_i64
-        value.each_char do |char|
-          parsed_value *= 256
-          parsed_value += char.ord
-        end
-      end
-
-      if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL
-        parsed_value = nil
-        account_for_zero = 0
-      end
-
-      reader.start += len + account_for_zero
-      reader.value = parsed_value
+      reader.start += len + lifted.account_for_zero
+      reader.value = lifted.parsed
       reader
     end
   end

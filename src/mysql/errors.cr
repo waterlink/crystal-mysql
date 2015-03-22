@@ -3,6 +3,7 @@ module MySQL
     class Base < Exception; end
     class Connection < Base; end
     class NotConnected < Base; end
+    class NotImplementedType < Base; end
 
     class UnableToRollbackTransaction < Base
       def initialize(original_error, error)
