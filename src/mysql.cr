@@ -65,9 +65,9 @@ class MySQL
     if handle == @handle
       @connected = true
     elsif handle.nil?
-      raise Errors::ConnectionError.new(error)
+      raise Errors::Connection.new(error)
     else
-      raise Errors::ConnectionError.new("Unreachable code")
+      raise Errors::Connection.new("Unreachable code")
     end
 
     self
@@ -93,7 +93,7 @@ class MySQL
     begin
       rollback_transaction
     rescue rollback_error
-      raise Errors::UnableToRollbackTransactionError.new(transaction_error, rollback_error)
+      raise Errors::UnableToRollbackTransaction.new(transaction_error, rollback_error)
     end
     raise transaction_error
   end
@@ -106,11 +106,11 @@ class MySQL
   # @non-threadsafe!
   def query(query_string)
     unless @connected
-      raise Errors::NotConnectedError.new
+      raise Errors::NotConnected.new
     end
 
     code = LibMySQL.query(@handle, query_string)
-    raise Errors::QueryError.new(error, query_string) if code != 0
+    raise Errors::Query.new(error, query_string) if code != 0
     result = LibMySQL.store_result(@handle)
     return nil if result.nil?
 

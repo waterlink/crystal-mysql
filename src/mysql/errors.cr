@@ -1,11 +1,10 @@
 class MySQL
   module Errors
-    class Error < Exception; end
-    class ConnectionError < Error; end
-    class NotConnectedError < Error; end
-    class ErrorInTransaction < Error; end
+    class Base < Exception; end
+    class Connection < Base; end
+    class NotConnected < Base; end
 
-    class UnableToRollbackTransactionError < Error
+    class UnableToRollbackTransaction < Base
       def initialize(original_error, error)
         super("Unable to rollback")
         @original_error = original_error
@@ -17,7 +16,7 @@ class MySQL
       end
     end
 
-    class QueryError < Error
+    class Query < Base
       def initialize(message, query)
         super(message)
         @query = query
