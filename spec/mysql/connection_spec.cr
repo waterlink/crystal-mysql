@@ -1,10 +1,10 @@
-require "./spec_helper"
+require "../spec_helper"
 
 class TestError < Exception; end
 
-describe MySQL do
+describe MySQL::Connection do
   described_class = -> {
-    MySQL
+    MySQL::Connection
   }
 
   subject = -> {
@@ -16,8 +16,8 @@ describe MySQL do
   }
 
   describe "#initialize & .new" do
-    it "creates instance of MySQL" do
-      subject.call.should be_a(MySQL)
+    it "creates instance of MySQL::Connection" do
+      subject.call.should be_a(MySQL::Connection)
     end
   end
 
