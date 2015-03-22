@@ -100,6 +100,7 @@ conn.close
 | Connection#rollback_transaction | Yes          |
 | Connection#transaction          | Yes          |
 | Connection#close                | Yes          |
+| Query                           | No           |
 
 ## Contributing
 
