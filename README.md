@@ -44,6 +44,39 @@ conn.query(%{SELECT * FROM user}) #=> [[1, "john@example.com", "John Smith"], [2
 conn.query(%{DROP TABLE user})
 ```
 
+### Making a transaction
+
+```crystal
+other_conn = MySQL.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+
+conn.transaction do
+  conn.query(%{SELECT COUNT(id) FROM user})  #=> 2
+  conn.query(%{INSERT INTO user(id, email, name) values(1, "james@example.com", "James Smith")})
+
+  conn.query(%{SELECT COUNT(id) FROM user})  #=> 3
+  other_conn.query(%{SELECT COUNT(id) FROM user})  #=> 2
+end
+
+conn.query(%{SELECT COUNT(id) FROM user})  #=> 3
+other_conn.query(%{SELECT COUNT(id) FROM user})  #=> 3
+```
+
+If block provided for `#transaction` raises exception, then it will rollback transaction automatically.
+
+You can use `#start_transaction`, `#commit_transaction` and `#rollback_transaction` manually:
+
+```crystal
+begin
+  conn.start_transaction
+  # .. do stuff with conn ..
+  conn.commit_transaction
+rescue
+  conn.rollback_transaction
+end
+```
+
+Nested transactions are possible.
+
 ## High-level API roadmap
 
 | High level method               | Implemented? |
