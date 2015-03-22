@@ -50,7 +50,7 @@ describe MySQL do
 
   describe "#connect" do
     it "fails with MySQL::ConnectionError when unable to connect" do
-      expect_raises(MySQL::ConnectionError, /Can't connect to MySQL server/) do
+      expect_raises(MySQL::Errors::ConnectionError, /Can't connect to MySQL server/) do
         subject.call.connect("127.0.0.1", "non-existent", "", "non-existent", 1234_u16, nil)
       end
     end
@@ -196,7 +196,7 @@ describe MySQL do
     end
 
     it "raises NotConnectedError when client is not connected" do
-      expect_raises(MySQL::NotConnectedError) do
+      expect_raises(MySQL::Errors::NotConnectedError) do
         subject.call.query("SELECT 1")
       end
     end
@@ -207,7 +207,7 @@ describe MySQL do
       conn = connected.call
       conn.close
 
-      expect_raises(MySQL::NotConnectedError) do
+      expect_raises(MySQL::Errors::NotConnectedError) do
         conn.query(%{SELECT 1})
       end
     end
@@ -310,7 +310,7 @@ describe MySQL do
         create_users.call
         conn = connected.call
 
-        expect_raises(MySQL::UnableToRollbackTransaction, /NotConnectedError/) do
+        expect_raises(MySQL::Errors::UnableToRollbackTransactionError, /NotConnectedError/) do
           conn.transaction do
             conn.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
             conn.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
