@@ -68,7 +68,7 @@ describe MySQL do
     end
 
     it "works with other simple query" do
-      connected.call.query(%{SELECT 1, 2.5, 3, "hello world"}).should eq([[1, 2.5, 3, "hello world"]])
+      connected.call.query(%{SELECT 1, 2.5, NULL, 3, "hello world"}).should eq([[1, 2.5, nil, 3, "hello world"]])
     end
 
     it "works with commands" do

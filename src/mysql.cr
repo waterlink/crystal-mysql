@@ -13,8 +13,10 @@ class MySQL
   class NotConnectedError < Error; end
   class QueryError < Error; end
 
+  alias SqlTypes = String|Int32|Float64|UInt64|Nil
+
   struct ValueReader
-    property value :: String|Int32|Float64|UInt64
+    property value :: SqlTypes
     property start
 
     def initialize(@value, @start)
@@ -25,6 +27,21 @@ class MySQL
       @start = 0
     end
   end
+
+  INTEGER_TYPES = [
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
+                  ]
+
+  FLOAT_TYPES = [
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL,
+                ]
 
   def initialize
     @handle = LibMySQL.init(nil)
@@ -76,7 +93,7 @@ class MySQL
       fields << field.value
     end
 
-    rows = [] of Array(String|Int32|Float64|UInt64)
+    rows = [] of Array(SqlTypes)
     while row = fetch_row(result, fields)
       rows << row
     end
@@ -93,7 +110,7 @@ class MySQL
     return nil if row.nil?
 
     reader = ValueReader.new
-    row_list = [] of String|Int32|Float64|UInt64
+    row_list = [] of SqlTypes
     fields.each do |field|
       reader = fetch_value(field, row, reader)
       row_list << reader.value
@@ -102,25 +119,10 @@ class MySQL
     row_list
   end
 
-  INTEGER_TYPES = [
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
-                  ]
-
-  FLOAT_TYPES = [
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL,
-                 ]
-
   def fetch_value(field, source, reader)
     len = field.max_length
     value = string_from_uint8(source[0] + reader.start, len)
-    if value[-1] == '\0'
+    if len > 0 && value[-1] == '\0'
       value = value[0...-1]
       len -= 1
     end
@@ -131,6 +133,11 @@ class MySQL
 
     if FLOAT_TYPES.includes?(field.field_type)
       value = value.to_f
+    end
+
+    if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL
+      value = nil
+      len = -1
     end
 
     reader.start += len + 1
