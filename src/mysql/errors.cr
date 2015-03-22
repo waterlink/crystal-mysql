@@ -1,4 +1,4 @@
-class MySQL
+module MySQL
   module Errors
     class Base < Exception; end
     class Connection < Base; end

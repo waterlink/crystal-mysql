@@ -1,4 +1,4 @@
-class MySQL
+module MySQL
   module Types
     alias SqlType = String|Time|Int32|Int64|Float64|Nil
 

@@ -1,4 +1,4 @@
-class MySQL
+module MySQL
   # MySQL connection class. Allows high-level interaction with mysql
   # through LibMySQL.
   #

@@ -1,4 +1,4 @@
 require "./mysql/*"
 
-class MySQL
+module MySQL
 end
