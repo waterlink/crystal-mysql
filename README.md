@@ -77,6 +77,12 @@ end
 
 Nested transactions are possible.
 
+### Closing connection
+
+```crystal
+conn.close
+```
+
 ## High-level API roadmap
 
 | High level method               | Implemented? |
