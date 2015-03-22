@@ -109,27 +109,36 @@ class MySQL
     row = LibMySQL.fetch_row(result)
     return nil if row.nil?
 
+    _lengths = LibMySQL.fetch_lengths(result)
+    lengths = [] of UInt32
+    fields.each_with_index do |x, index|
+      lengths << _lengths[index * 2]
+    end
+
     reader = ValueReader.new
     row_list = [] of SqlType
+    index = 0
     fields.each do |field|
-      reader = fetch_value(field, row, reader)
+      reader = fetch_value(field, row, reader, lengths[index])
       row_list << reader.value
+      index += 1
     end
 
     row_list
   end
 
-  def fetch_value(field, source, reader)
-    len = field.max_length
+  def fetch_value(field, source, reader, len)
     value = string_from_uint8(source[0] + reader.start, len)
-    if len > 0 && value[-1] == '\0'
-      value = value[0...-1]
-      len -= 1
-    end
+
+    account_for_zero = 1
 
     if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP ||
         field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME
       value = TimeFormat.new("%F %T").parse(value)
+    end
+
+    if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE && value.is_a?(String)
+      value = TimeFormat.new("%F").parse(value)
     end
 
     if INTEGER_TYPES.includes?(field.field_type)
@@ -142,15 +151,15 @@ class MySQL
 
     if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL
       value = nil
-      len = -1
+      account_for_zero = 0
     end
 
-    reader.start += len + 1
+    reader.start += len + account_for_zero
     reader.value = value
     reader
   end
 
   def string_from_uint8(s, len)
-    (0_u64...len).inject("") { |acc, i| acc + s[i].chr }
+    (0_u32...len).inject("") { |acc, i| acc + s[i].chr }
   end
 end
