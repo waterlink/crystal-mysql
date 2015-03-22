@@ -8,34 +8,6 @@ require "./mysql/*"
 # concurrency is needed, then each concurrent task should own its own
 # connection.
 class MySQL
-  class Error < Exception; end
-  class ConnectionError < Error; end
-  class NotConnectedError < Error; end
-  class ErrorInTransaction < Error; end
-
-  class UnableToRollbackTransaction < Error
-    def initialize(original_error, error)
-      super("Unable to rollback")
-      @original_error = original_error
-      @error = error
-    end
-
-    def to_s
-      "Transaction Error: #{@original_error.inspect},\n Rollback Error: #{@error.inspect}"
-    end
-  end
-
-  class QueryError < Error
-    def initialize(message, query)
-      super(message)
-      @query = query
-    end
-
-    def to_s
-      "Error: #{super},\n Query: #{@query.inspect}"
-    end
-  end
-
   alias SqlType = String|Time|Int32|Int64|Float64|Nil
 
   struct ValueReader
@@ -154,6 +126,8 @@ class MySQL
 
     # NOTE: Why this happens here:
     # *** Error in `/tmp/crystal-run-spec.CAKQ1K': double free or corruption (out): 0x00000000008fa040 ***
+    # NOTE: Probably because if result is already exhausted, it just frees itself
+    #       That means, that this thing is only useful for #lazy_query
     #LibMySQL.free_result(result)
 
     rows
