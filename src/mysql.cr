@@ -8,10 +8,8 @@ require "./mysql/*"
 # concurrency is needed, then each concurrent task should own its own
 # connection.
 class MySQL
-  alias SqlType = String|Time|Int32|Int64|Float64|Nil
-
   struct ValueReader
-    property value :: SqlType
+    property value :: Types::SqlType
     property start
 
     def initialize(@value, @start)
@@ -22,22 +20,6 @@ class MySQL
       @start = 0
     end
   end
-
-  INTEGER_TYPES = [
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_YEAR,
-                  ]
-
-  FLOAT_TYPES = [
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE,
-                 LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL,
-                ]
 
   def initialize
     @handle = LibMySQL.init(nil)
@@ -119,7 +101,7 @@ class MySQL
       fields << field.value
     end
 
-    rows = [] of Array(SqlType)
+    rows = [] of Array(Types::SqlType)
     while row = fetch_row(result, fields)
       rows << row
     end
@@ -144,7 +126,7 @@ class MySQL
     end
 
     reader = ValueReader.new
-    row_list = [] of SqlType
+    row_list = [] of Types::SqlType
     index = 0
     fields.each do |field|
       reader = fetch_value(field, row, reader, lengths[index])
@@ -171,11 +153,11 @@ class MySQL
       parsed_value = TimeFormat.new("%F").parse(value)
     end
 
-    if INTEGER_TYPES.includes?(field.field_type)
+    if Types::INTEGER_TYPES.includes?(field.field_type)
       parsed_value = value.to_i
     end
 
-    if FLOAT_TYPES.includes?(field.field_type)
+    if Types::FLOAT_TYPES.includes?(field.field_type)
       parsed_value = value.to_f
     end
 
