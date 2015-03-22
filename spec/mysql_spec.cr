@@ -199,4 +199,15 @@ describe MySQL do
       end
     end
   end
+
+  describe "#close" do
+    it "closes the connection" do
+      conn = connected.call
+      conn.close
+
+      expect_raises(MySQL::NotConnectedError) do
+        conn.query(%{SELECT 1})
+      end
+    end
+  end
 end

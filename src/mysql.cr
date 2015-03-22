@@ -78,6 +78,11 @@ class MySQL
     self
   end
 
+  def close
+    LibMySQL.close(@handle)
+    @connected = nil
+  end
+
   # @non-threadsafe!
   def query(query_string)
     unless @connected

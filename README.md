@@ -22,7 +22,7 @@ Basic MySQL bindings for Crystal.
 | MySQL#host_info       | No           |
 | MySQL#query           | 65% (usable) |
 | MySQL#transaction     | No           |
-| MySQL#close           | No           |
+| MySQL#close           | Yes          |
 
 ## Low-level API roadmap
 
