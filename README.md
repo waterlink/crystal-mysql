@@ -18,7 +18,16 @@ end
 
 ## Usage
 
-*No usage yet, since basic high level APIs are not yet implemented (such as `#query`)*
+```crystal
+require "mysql"
+```
+
+### Connecting to mysql
+
+```crystal
+# MySQL.connect(host, user, password, database, port, socket, flags = 0)
+conn = MySQL.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+```
 
 ## High-level API roadmap
 
