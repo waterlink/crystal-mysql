@@ -34,6 +34,7 @@ class MySQL
                    LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
                    LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
                    LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_YEAR,
                   ]
 
   FLOAT_TYPES = [

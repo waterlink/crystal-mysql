@@ -116,6 +116,36 @@ describe MySQL do
                    ])
     end
 
+    it "works with year(4)" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS event})
+      conn.query(%{CREATE TABLE event (id INT, created_on YEAR, what VARCHAR(50))})
+
+      conn.query(%{INSERT INTO event values(1, '2044', 'order')})
+      conn.query(%{INSERT INTO event values(2, '89', 'shipment')})
+
+      conn.query(%{SELECT * FROM event})
+        .should eq([
+                    [1, 2044, "order"],
+                    [2, 1989, "shipment"],
+                   ])
+    end
+
+    it "works with year(2)" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS event})
+      conn.query(%{CREATE TABLE event (id INT, created_on YEAR(2), what VARCHAR(50))})
+
+      conn.query(%{INSERT INTO event values(1, '2044', 'order')})
+      conn.query(%{INSERT INTO event values(2, '89', 'shipment')})
+
+      conn.query(%{SELECT * FROM event})
+        .should eq([
+                    [1, 44, "order"],
+                    [2, 89, "shipment"],
+                   ])
+    end
+
     it "works with commands" do
       connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
       connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
