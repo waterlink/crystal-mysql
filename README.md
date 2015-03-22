@@ -6,6 +6,16 @@ Fork of https://github.com/farleyknight/crystal-mysql
 
 Basic MySQL bindings for Crystal.
 
+## Installation
+
+Add it to your `Projectfile`
+
+```crystal
+deps do
+  github "waterlink/crystal-mysql"
+end
+```
+
 ## Usage
 
 *No usage yet, since basic high level APIs are not yet implemented (such as `#query`)*
