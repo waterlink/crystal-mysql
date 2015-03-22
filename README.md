@@ -28,26 +28,6 @@ Basic MySQL bindings for Crystal.
 | Connection#transaction          | Yes          |
 | Connection#close                | Yes          |
 
-## Low-level API roadmap
-
-| C Function            | Crystal Function      | Implemented? |
-|-----------------------|-----------------------|--------------|
-| mysql_init            | LibMySQL.init         | Yes          |
-| mysql_real_connect    | LibMySQL.real_connect | Yes          |
-| mysql_get_client_info | LibMySQL.client_info  | Yes          |
-| mysql_get_host_info   | LibMySQL.host_info    | No           |
-| mysql_commit          | LibMySQL.commit       | No           |
-| mysql_error           | LibMySQL.error        | Yes          |
-| mysql_query           | LibMySQL.query        | Yes          |
-| mysql_close           | LibMySQL.close        | Yes          |
-| mysql_store_result    | LibMySQL.store_result | Yes          |
-| mysql_fetch_row       | LibMySQL.fetch_row    | Yes          |
-| mysql_num_fieldds     | LibMySQL.num_fieldds  | Yes          |
-| mysql_fetch_lengths   | LibMySQL.fetch_lengths| Yes          |
-| mysql_fetch_field     | LibMySQL.fetch_field  | Yes          |
-| mysql_fetch_fields    | LibMySQL.fetch_fields | Yes          |
-| mysql_free_result     | LibMySQL.free_result  | Yes          |
-
 ## Contributing
 
 1. Fork it ( https://github.com/waterlink/crystal-mysql/fork )
