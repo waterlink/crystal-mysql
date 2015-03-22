@@ -43,12 +43,6 @@ module MySQL
       end
     end
 
-    describe "#escape_string" do
-      it "provides protection from nasty queries" do
-        subject.call.escape_string("'; DROP TABLE users; --").should eq("\\'; DROP TABLE users; --")
-      end
-    end
-
     describe "#connect" do
       it "fails with ConnectionError when unable to connect" do
         expect_raises(Errors::Connection, /Can't connect to MySQL server/) do
