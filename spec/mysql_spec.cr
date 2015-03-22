@@ -1,5 +1,7 @@
 require "./spec_helper"
 
+class TestError < Exception; end
+
 describe MySQL do
   described_class = -> {
     MySQL
@@ -207,6 +209,117 @@ describe MySQL do
 
       expect_raises(MySQL::NotConnectedError) do
         conn.query(%{SELECT 1})
+      end
+    end
+  end
+
+  describe "#transaction" do
+    create_users = -> {
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS user})
+      conn.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
+      conn.close
+    }
+
+    context "when not using transactions" do
+      it "different connections can see changes of each other" do
+        create_users.call
+        conn0 = connected.call
+        conn1 = connected.call
+
+        conn0.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
+        conn1.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+        conn1.query(%{INSERT INTO user values(2, 'sarah@example.org', 'Sarah')})
+        conn0.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+      end
+    end
+
+    context "when using transactions" do
+      it "different connections can not see changes of each other" do
+        create_users.call
+        conn0 = connected.call
+        conn1 = connected.call
+
+        conn0.transaction do
+          conn0.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
+
+          conn1.transaction do
+            conn0.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+            conn1.query(%{SELECT COUNT(id) FROM user}).should eq([[0]])
+
+            conn1.query(%{INSERT INTO user values(2, 'sarah@example.org', 'Sarah')})
+
+            conn0.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+            conn1.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+          end
+
+          conn0.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+          conn1.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+        end
+
+        conn0.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+        conn1.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+      end
+
+      it "rolls back transaction when it fails" do
+        create_users.call
+        conn = connected.call
+
+        expect_raises(TestError) do
+          conn.transaction do
+            conn.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
+            conn.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+            raise TestError.new
+          end
+        end
+
+        conn.query(%{SELECT COUNT(id) FROM user}).should eq([[0]])
+      end
+
+      it "works as expected when nested transactions are used" do
+        create_users.call
+        conn = connected.call
+
+        conn.transaction do
+          conn.query(%{SELECT COUNT(id) FROM user}).should eq([[0]])
+          conn.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
+          conn.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+
+          conn.transaction do
+            conn.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+            conn.query(%{INSERT INTO user values(2, 'sarah@example.org', 'Sarah')})
+            conn.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+          end
+
+          expect_raises(TestError) do
+            conn.transaction do
+              conn.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+              conn.query(%{INSERT INTO user values(2, 'sarah@example.org', 'Sarah')})
+              conn.query(%{SELECT COUNT(id) FROM user}).should eq([[3]])
+              raise TestError.new
+            end
+          end
+
+          conn.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+        end
+
+        conn.query(%{SELECT COUNT(id) FROM user}).should eq([[2]])
+      end
+
+      it "raises UnableToRollbackTransaction when it is unable to roll it back" do
+        create_users.call
+        conn = connected.call
+
+        expect_raises(MySQL::UnableToRollbackTransaction, /NotConnectedError/) do
+          conn.transaction do
+            conn.query(%{INSERT INTO user values(1, 'john@example.org', 'John')})
+            conn.query(%{SELECT COUNT(id) FROM user}).should eq([[1]])
+            conn.close
+            raise TestError.new
+          end
+        end
+
+        connected.call.query(%{SELECT COUNT(id) FROM user}).should eq([[0]])
       end
     end
   end

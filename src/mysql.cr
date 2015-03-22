@@ -11,7 +11,30 @@ class MySQL
   class Error < Exception; end
   class ConnectionError < Error; end
   class NotConnectedError < Error; end
-  class QueryError < Error; end
+  class ErrorInTransaction < Error; end
+
+  class UnableToRollbackTransaction < Error
+    def initialize(original_error, error)
+      super("Unable to rollback")
+      @original_error = original_error
+      @error = error
+    end
+
+    def to_s
+      "Transaction Error: #{@original_error.inspect},\n Rollback Error: #{@error.inspect}"
+    end
+  end
+
+  class QueryError < Error
+    def initialize(message, query)
+      super(message)
+      @query = query
+    end
+
+    def to_s
+      "Error: #{super},\n Query: #{@query.inspect}"
+    end
+  end
 
   alias SqlType = String|Time|Int32|Int64|Float64|Nil
 
@@ -78,6 +101,31 @@ class MySQL
     self
   end
 
+  def start_transaction
+    query(%{START TRANSACTION})
+  end
+
+  def commit_transaction
+    query(%{COMMIT})
+  end
+
+  def rollback_transaction
+    query(%{ROLLBACK})
+  end
+
+  def transaction
+    start_transaction
+    yield
+    commit_transaction
+  rescue transaction_error
+    begin
+      rollback_transaction
+    rescue rollback_error
+      raise UnableToRollbackTransaction.new(transaction_error, rollback_error)
+    end
+    raise transaction_error
+  end
+
   def close
     LibMySQL.close(@handle)
     @connected = nil
@@ -90,7 +138,7 @@ class MySQL
     end
 
     code = LibMySQL.query(@handle, query_string)
-    raise QueryError.new(error) if code != 0
+    raise QueryError.new(error, query_string) if code != 0
     result = LibMySQL.store_result(@handle)
     return nil if result.nil?
 
