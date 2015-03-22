@@ -86,6 +86,21 @@ describe MySQL do
                    ])
     end
 
+    it "works with datetime" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS event})
+      conn.query(%{CREATE TABLE event (id INT, created_at DATETIME, what VARCHAR(50))})
+
+      conn.query(%{INSERT INTO event values(1, '2005-03-27 02:00:00', 'login')})
+      conn.query(%{INSERT INTO event values(2, '2005-03-27 02:02:00', 'logout')})
+
+      conn.query(%{SELECT * FROM event})
+        .should eq([
+                    [1, TimeFormat.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+                    [2, TimeFormat.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+                   ])
+    end
+
     it "works with commands" do
       connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
       connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
