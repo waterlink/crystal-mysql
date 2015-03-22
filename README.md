@@ -12,20 +12,21 @@ Basic MySQL bindings for Crystal.
 
 ## High-level API roadmap
 
-| High level method          | Implemented? |
-|----------------------------|--------------|
-| MySQL#initialize           | Yes          |
-| MySQL#client_info          | Yes          |
-| MySQL#error                | Yes          |
-| MySQL#escape_string        | Yes          |
-| MySQL#connect              | Yes          |
-| MySQL#host_info            | No           |
-| MySQL#query                | 65% (usable) |
-| MySQL#start_transaction    | Yes          |
-| MySQL#commit_transaction   | Yes          |
-| MySQL#rollback_transaction | Yes          |
-| MySQL#transaction          | Yes          |
-| MySQL#close                | Yes          |
+| High level method               | Implemented? |
+|---------------------------------|--------------|
+| MySQL.connect                   | Yes          |
+| Connection#initialize           | Yes          |
+| Connection#client_info          | Yes          |
+| Connection#error                | Yes          |
+| Support#escape_string           | Yes          |
+| Connection#connect              | Yes          |
+| Connection#host_info            | No           |
+| Connection#query                | 65% (usable) |
+| Connection#start_transaction    | Yes          |
+| Connection#commit_transaction   | Yes          |
+| Connection#rollback_transaction | Yes          |
+| Connection#transaction          | Yes          |
+| Connection#close                | Yes          |
 
 ## Low-level API roadmap
 
