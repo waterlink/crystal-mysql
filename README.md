@@ -94,7 +94,7 @@ conn.close
 | Support#escape_string           | Yes          |
 | Connection#connect              | Yes          |
 | Connection#host_info            | No           |
-| Connection#query                | 65% (usable) |
+| Connection#query                | 72% (usable) |
 | Connection#start_transaction    | Yes          |
 | Connection#commit_transaction   | Yes          |
 | Connection#rollback_transaction | Yes          |
