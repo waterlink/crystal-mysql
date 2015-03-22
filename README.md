@@ -20,7 +20,7 @@ Basic MySQL bindings for Crystal.
 | MySQL#escape_string   | Yes          |
 | MySQL#connect         | Yes          |
 | MySQL#host_info       | No           |
-| MySQL#query           | 60%          |
+| MySQL#query           | 65% (usable) |
 | MySQL#transaction     | No           |
 | MySQL#close           | No           |
 
