@@ -29,6 +29,21 @@ require "mysql"
 conn = MySQL.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
 ```
 
+### Making a query
+
+```crystal
+conn.query(%{SELECT 1})  #=> [[1]]
+
+conn.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
+
+conn.query(%{INSERT INTO user(id, email, name) values(1, "john@example.com", "John Smith")})
+conn.query(%{INSERT INTO user(id, email, name) values(2, "sarah@example.com", "Sarah Smith")})
+
+conn.query(%{SELECT * FROM user}) #=> [[1, "john@example.com", "John Smith"], [2, "sarah@example.com", "Sarah Smith"]]
+
+conn.query(%{DROP TABLE user})
+```
+
 ## High-level API roadmap
 
 | High level method               | Implemented? |
