@@ -1,7 +1,13 @@
+os:
+  - linux
+  - osx
+
 language: c
 before_install: |
-  curl http://dist.crystal-lang.org/apt/setup.sh | sudo bash
-  sudo apt-get -q update
+  which apt-get && curl http://dist.crystal-lang.org/apt/setup.sh | sudo bash
+  which apt-get && sudo apt-get -q update
+  which brew && brew tap manastech/crystal
+  which brew && brew install crystal
 
 install: |
   sudo apt-get install crystal
