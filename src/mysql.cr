@@ -13,6 +13,19 @@ class MySQL
   class NotConnectedError < Error; end
   class QueryError < Error; end
 
+  struct ValueReader
+    property value :: String|Int32|Float64|UInt64
+    property start
+
+    def initialize(@value, @start)
+    end
+
+    def initialize
+      @value = ""
+      @start = 0
+    end
+  end
+
   def initialize
     @handle = LibMySQL.init(nil)
     @connected = false
@@ -63,7 +76,7 @@ class MySQL
       fields << field.value
     end
 
-    rows = [] of Array(String)
+    rows = [] of Array(String|Int32|Float64|UInt64)
     while row = fetch_row(result, fields)
       rows << row
     end
@@ -79,24 +92,50 @@ class MySQL
     row = LibMySQL.fetch_row(result)
     return nil if row.nil?
 
-    full_len = 0
-    index = 0
-    row_list = [] of String
+    reader = ValueReader.new
+    row_list = [] of String|Int32|Float64|UInt64
     fields.each do |field|
-      len = field.max_length
-
-      value = string_from_uint8(row[0] + full_len, len)
-      if value[-1] == '\0'
-        value = value[0...-1]
-        len -= 1
-      end
-
-      full_len += len + 1
-      index += 1
-      row_list << value
+      reader = fetch_value(field, row, reader)
+      row_list << reader.value
     end
 
     row_list
+  end
+
+  INTEGER_TYPES = [
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
+                   LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
+                  ]
+
+  FLOAT_TYPES = [
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE,
+                 LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL,
+                 ]
+
+  def fetch_value(field, source, reader)
+    len = field.max_length
+    value = string_from_uint8(source[0] + reader.start, len)
+    if value[-1] == '\0'
+      value = value[0...-1]
+      len -= 1
+    end
+
+    if INTEGER_TYPES.includes?(field.field_type)
+      value = value.to_i
+    end
+
+    if FLOAT_TYPES.includes?(field.field_type)
+      value = value.to_f
+    end
+
+    reader.start += len + 1
+    reader.value = value
+    reader
   end
 
   def string_from_uint8(s, len)

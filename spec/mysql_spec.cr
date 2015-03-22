@@ -64,11 +64,11 @@ describe MySQL do
 
   describe "#query" do
     it "works with simple query" do
-      connected.call.query("SELECT 1").should eq([["1"]])
+      connected.call.query("SELECT 1").should eq([[1]])
     end
 
     it "works with other simple query" do
-      connected.call.query(%{SELECT 1, 2, 3, "hello world"}).should eq([["1", "2", "3", "hello world"]])
+      connected.call.query(%{SELECT 1, 2.5, 3, "hello world"}).should eq([[1, 2.5, 3, "hello world"]])
     end
 
     it "works with commands" do
@@ -87,8 +87,8 @@ describe MySQL do
 
       conn.query(%{SELECT * FROM user})
         .should eq([
-                    ["1", "john@example.com", "John Smith"],
-                    ["2", "sarah@example.com", "Sarah Smith"],
+                    [1, "john@example.com", "John Smith"],
+                    [2, "sarah@example.com", "Sarah Smith"],
                    ])
     end
 
