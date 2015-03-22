@@ -2,22 +2,6 @@ module MySQL
   module Types
     alias SqlType = String|Time|Int32|Int64|Float64|Nil
 
-    INTEGER_TYPES = [
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY,
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT,
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG,
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG,
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24,
-                     LibMySQL::MySQLFieldType::MYSQL_TYPE_YEAR,
-                    ]
-
-    FLOAT_TYPES = [
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE,
-                   LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL,
-                  ]
-
     struct Value
       property value
       property field
@@ -34,32 +18,7 @@ module MySQL
       end
 
       def lift
-        if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP ||
-            field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME
-          return Datetime.new(value, field)
-        end
-
-        if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE && value.is_a?(String)
-          return Date.new(value, field)
-        end
-
-        if Types::INTEGER_TYPES.includes?(field.field_type)
-          return Integer.new(value, field)
-        end
-
-        if Types::FLOAT_TYPES.includes?(field.field_type)
-          return Float.new(value, field)
-        end
-
-        if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT
-          return Bit.new(value, field)
-        end
-
-        if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL
-          return Null.new(value, field)
-        end
-
-        self
+        VALUE_DISPATCH.fetch(field.field_type) { Value }.new(value, field)
       end
     end
 
@@ -107,5 +66,32 @@ module MySQL
         0
       end
     end
+
+    VALUE_DISPATCH = {
+      # Integer values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24 => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_YEAR => Integer,
+
+      # Float values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DECIMAL => Float,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_FLOAT => Float,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DOUBLE => Float,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_NEWDECIMAL => Float,
+
+      # Date & Time values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP => Datetime,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME => Datetime,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE => Date,
+
+      # Bit values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT => Bit,
+
+      # NULL values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL => Null,
+    }
   end
 end
