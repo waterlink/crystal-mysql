@@ -48,12 +48,8 @@ describe MySQL do
 
   describe "#connect" do
     it "fails with MySQL::ConnectionError when unable to connect" do
-      begin
+      expect_raises(MySQL::ConnectionError, /Can't connect to MySQL server/) do
         subject.call.connect("127.0.0.1", "non-existent", "", "non-existent", 1234_u16, nil)
-        raise Exception.new("should raise")
-      rescue e
-        e.should be_a(MySQL::ConnectionError)
-        e.message.should match(/Can't connect to MySQL server/)
       end
     end
 
@@ -198,11 +194,8 @@ describe MySQL do
     end
 
     it "raises NotConnectedError when client is not connected" do
-      begin
+      expect_raises(MySQL::NotConnectedError) do
         subject.call.query("SELECT 1")
-        raise Exception.new("should raise")
-      rescue e
-        e.should be_a(MySQL::NotConnectedError)
       end
     end
   end
