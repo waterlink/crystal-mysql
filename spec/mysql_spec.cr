@@ -146,6 +146,36 @@ describe MySQL do
                    ])
     end
 
+    it "works with small bit type" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS flags})
+      conn.query(%{CREATE TABLE flags (id INT, value BIT(6), description VARCHAR(100))})
+
+      conn.query(%{INSERT INTO flags values(1, b'000101', 'hello')})
+      conn.query(%{INSERT INTO flags values(2, b'1001', 'some interesting stuff')})
+
+      conn.query(%{SELECT * FROM flags})
+        .should eq([
+                    [1, 5, "hello"],
+                    [2, 9, "some interesting stuff"],
+                   ])
+    end
+
+    it "works with big bit type" do
+      conn = connected.call
+      conn.query(%{DROP TABLE IF EXISTS flags})
+      conn.query(%{CREATE TABLE flags (id INT, value BIT(64), description VARCHAR(100))})
+
+      conn.query(%{INSERT INTO flags values(1, b'000101', 'hello')})
+      conn.query(%{INSERT INTO flags values(2, b'0100000000100000000000000000000000000000000000000000001000000001', 'some interesting stuff')})
+
+      conn.query(%{SELECT * FROM flags})
+        .should eq([
+                    [1, 5, "hello"],
+                    [2, 4620693217682129409, "some interesting stuff"],
+                   ])
+    end
+
     it "works with commands" do
       connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
       connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})

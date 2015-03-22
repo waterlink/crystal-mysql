@@ -133,30 +133,40 @@ class MySQL
 
     account_for_zero = 1
 
+    parsed_value = value
+
     if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP ||
         field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME
-      value = TimeFormat.new("%F %T").parse(value)
+      parsed_value = TimeFormat.new("%F %T").parse(value)
     end
 
     if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE && value.is_a?(String)
-      value = TimeFormat.new("%F").parse(value)
+      parsed_value = TimeFormat.new("%F").parse(value)
     end
 
     if INTEGER_TYPES.includes?(field.field_type)
-      value = value.to_i
+      parsed_value = value.to_i
     end
 
     if FLOAT_TYPES.includes?(field.field_type)
-      value = value.to_f
+      parsed_value = value.to_f
+    end
+
+    if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT
+      parsed_value = 0_i64
+      value.each_char do |char|
+        parsed_value *= 256
+        parsed_value += char.ord
+      end
     end
 
     if field.field_type == LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL
-      value = nil
+      parsed_value = nil
       account_for_zero = 0
     end
 
     reader.start += len + account_for_zero
-    reader.value = value
+    reader.value = parsed_value
     reader
   end
 
