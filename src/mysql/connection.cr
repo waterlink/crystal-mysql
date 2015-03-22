@@ -111,22 +111,24 @@ module MySQL
       row = LibMySQL.fetch_row(result)
       return nil if row.nil?
 
+      lengths = lengths_from(result, fields)
+      reader = ValueReader.new
+      row_list = [] of Types::SqlType
+      fields.each_with_index do |field, index|
+        reader = fetch_value(field, row, reader, lengths[index])
+        row_list << reader.value
+      end
+
+      row_list
+    end
+
+    private def lengths_from(result, fields)
       _lengths = LibMySQL.fetch_lengths(result)
       lengths = [] of UInt32
       fields.each_with_index do |x, index|
         lengths << _lengths[index * 2]
       end
-
-      reader = ValueReader.new
-      row_list = [] of Types::SqlType
-      index = 0
-      fields.each do |field|
-        reader = fetch_value(field, row, reader, lengths[index])
-        row_list << reader.value
-        index += 1
-      end
-
-      row_list
+      lengths
     end
 
     private def fetch_value(field, source, reader, len)
