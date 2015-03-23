@@ -16,6 +16,10 @@ module MySQL
       subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
     }
 
+    version = -> {
+      subject.call.client_info
+    }
+
     describe "#initialize & .new" do
       it "creates instance of Connection" do
         subject.call.should be_a(Connection)
@@ -66,6 +70,7 @@ module MySQL
 
       it "works with timestamp" do
         conn = connected.call
+        conn.query(%{SET time_zone='+0:00'})
         conn.query(%{DROP TABLE IF EXISTS event})
         conn.query(%{CREATE TABLE event (id INT, created_at TIMESTAMP, what VARCHAR(50))})
 
@@ -132,11 +137,19 @@ module MySQL
         conn.query(%{INSERT INTO event values(1, '2044', 'order')})
         conn.query(%{INSERT INTO event values(2, '89', 'shipment')})
 
-        conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, 44, "order"],
-                      [2, 89, "shipment"],
-                     ])
+        if version.call =~ /5\.6/
+          conn.query(%{SELECT * FROM event})
+            .should eq([
+                         [1, 2044, "order"],
+                         [2, 1989, "shipment"],
+                       ])
+        else
+          conn.query(%{SELECT * FROM event})
+            .should eq([
+                         [1, 44, "order"],
+                         [2, 89, "shipment"],
+                       ])
+        end
       end
 
       it "works with small bit type" do
