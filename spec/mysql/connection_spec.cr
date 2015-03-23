@@ -66,6 +66,7 @@ module MySQL
 
       it "works with timestamp" do
         conn = connected.call
+        conn.query(%{SET time_zone='+0:00'})
         conn.query(%{DROP TABLE IF EXISTS event})
         conn.query(%{CREATE TABLE event (id INT, created_at TIMESTAMP, what VARCHAR(50))})
 
