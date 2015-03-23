@@ -1,12 +1,17 @@
 module MySQL
   module Types
     alias SqlType = String|Time|Int32|Int64|Float64|Nil
+    IGNORE_FIELD = LibMySQL::MySQLField.new
 
     struct Value
       property value
       property field
 
       def initialize(@value, @field)
+      end
+
+      def initialize(@value)
+        @field = IGNORE_FIELD
       end
 
       def account_for_zero
@@ -17,20 +22,38 @@ module MySQL
         value
       end
 
+      def to_mysql
+        "'#{value.to_s}'"
+      end
+
       def lift
         VALUE_DISPATCH.fetch(field.field_type) { Value }.new(value, field)
+      end
+
+      def lift_down
+        if value.is_a?(Nil)
+          Null
+        elsif value.is_a?(Int)
+          Integer
+        elsif value.is_a?(::Float)
+          Float
+        elsif value.is_a?(Time)
+          Datetime
+        else
+          Value
+        end.new(value, field)
       end
     end
 
     struct Datetime < Value
       def parsed
-        TimeFormat.new("%F %T").parse(value)
+        TimeFormat.new("%F %T").parse(value.to_s)
       end
     end
 
     struct Date < Value
       def parsed
-        TimeFormat.new("%F").parse(value)
+        TimeFormat.new("%F").parse(value.to_s)
       end
     end
 
@@ -38,18 +61,26 @@ module MySQL
       def parsed
         value.to_i
       end
+
+      def to_mysql
+        value.to_s
+      end
     end
 
     struct Float < Value
       def parsed
-        value.to_f
+        value.to_s.to_f
+      end
+
+      def to_mysql
+        value.to_s
       end
     end
 
     struct Bit < Value
       def parsed
         parsed_value = 0_i64
-        value.each_char do |char|
+        value.to_s.each_char do |char|
           parsed_value *= 256
           parsed_value += char.ord
         end
@@ -60,6 +91,10 @@ module MySQL
     struct Null < Value
       def parsed
         nil
+      end
+
+      def to_mysql
+        "NULL"
       end
 
       def account_for_zero
