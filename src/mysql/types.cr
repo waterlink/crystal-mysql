@@ -31,18 +31,14 @@ module MySQL
       end
 
       def lift_down
-        if value.is_a?(Nil)
-          Null
-        elsif value.is_a?(Int)
-          Integer
-        elsif value.is_a?(::Float)
-          Float
-        elsif value.is_a?(Time)
-          Datetime
-        else
-          Value
-        end.new(value, field)
+        lift_down_class(value).new(value, field)
       end
+
+      def lift_down_class(value : Nil) Null end
+      def lift_down_class(value : Int) Integer end
+      def lift_down_class(value : ::Float) Float end
+      def lift_down_class(value : Time) Datetime end
+      def lift_down_class(value) Value end
     end
 
     struct Datetime < Value
