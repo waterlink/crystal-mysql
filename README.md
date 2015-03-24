@@ -47,7 +47,7 @@ conn.query(%{DROP TABLE user})
 ### Using higher level Query api
 
 ```crystal
-Query
+MySQL::Query
   .new(%{SELECT * FROM user WHERE created_at > :from_filter},
        { "from_filter" => 14.days.ago })
   .run(conn)
