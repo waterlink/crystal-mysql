@@ -182,6 +182,21 @@ module MySQL
                      ])
       end
 
+      it "works with boolean type" do
+        conn = connected.call
+        conn.query(%{DROP TABLE IF EXISTS user})
+        conn.query(%{CREATE TABLE user (id INT, email VARCHAR(255), activated BOOLEAN)})
+
+        conn.query(%{INSERT INTO user VALUES(1, "john@example.org", TRUE)})
+        conn.query(%{INSERT INTO user VALUES(2, "sarah@example.org", FALSE)})
+
+        conn.query(%{SELECT * FROM user})
+          .should eq([
+                      [1, "john@example.org", 1],
+                      [2, "sarah@example.org", 0],
+                     ])
+      end
+
       it "works with commands" do
         connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
         connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})

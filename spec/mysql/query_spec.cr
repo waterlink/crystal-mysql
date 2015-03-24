@@ -76,6 +76,13 @@ module MySQL
       it "works with nil" do
         Query.new(%{SELECT :a}, {"a" => nil}).to_mysql.should eq(%{SELECT NULL})
       end
+
+      it "works with boolean" do
+        Query.new(%{SELECT :a, :b},
+                  { "a" => true,
+                    "b" => false })
+          .to_mysql.should eq(%{SELECT TRUE, FALSE})
+      end
     end
 
     describe "escapes strings properly" do

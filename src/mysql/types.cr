@@ -12,7 +12,7 @@ module MySQL
       end
     end
 
-    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date
+    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date|Bool
     IGNORE_FIELD = LibMySQL::MySQLField.new
 
     struct Value
@@ -48,6 +48,7 @@ module MySQL
       end
 
       private def lift_down_class(value : Nil) Null end
+      private def lift_down_class(value : Bool) Boolean end
       private def lift_down_class(value : Int) Integer end
       private def lift_down_class(value : ::Float) Float end
       private def lift_down_class(value) Value end
@@ -93,6 +94,12 @@ module MySQL
           parsed_value += char.ord
         end
         parsed_value
+      end
+    end
+
+    struct Boolean < Value
+      def to_mysql
+        value ? "TRUE" : "FALSE"
       end
     end
 
