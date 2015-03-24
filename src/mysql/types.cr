@@ -1,12 +1,29 @@
 module MySQL
   module Types
-    alias SqlType = String|Time|Int32|Int64|Float64|Nil
+    struct Date
+      property time
+
+      def initialize(time : Time)
+        @time = time.date
+      end
+
+      def to_s
+        TimeFormat.new("%F").format(time)
+      end
+    end
+
+    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date
+    IGNORE_FIELD = LibMySQL::MySQLField.new
 
     struct Value
       property value
       property field
 
       def initialize(@value, @field)
+      end
+
+      def initialize(@value)
+        @field = IGNORE_FIELD
       end
 
       def account_for_zero
@@ -17,39 +34,61 @@ module MySQL
         value
       end
 
+      def to_mysql
+        "'#{Support.escape_string(value.to_s)}'"
+      end
+
       def lift
+        return self unless self.is_a?(Value)
         VALUE_DISPATCH.fetch(field.field_type) { Value }.new(value, field)
       end
+
+      def lift_down
+        lift_down_class(value).new(value, field)
+      end
+
+      private def lift_down_class(value : Nil) Null end
+      private def lift_down_class(value : Int) Integer end
+      private def lift_down_class(value : ::Float) Float end
+      private def lift_down_class(value) Value end
     end
 
     struct Datetime < Value
       def parsed
-        TimeFormat.new("%F %T").parse(value)
+        TimeFormat.new("%F %T").parse(value.to_s)
       end
     end
 
-    struct Date < Value
+    struct SqlDate < Value
       def parsed
-        TimeFormat.new("%F").parse(value)
+        TimeFormat.new("%F").parse(value.to_s)
       end
     end
 
     struct Integer < Value
       def parsed
-        value.to_i
+        value.to_s.to_i
+      end
+
+      def to_mysql
+        value.to_s
       end
     end
 
     struct Float < Value
       def parsed
-        value.to_f
+        value.to_s.to_f
+      end
+
+      def to_mysql
+        value.to_s
       end
     end
 
     struct Bit < Value
       def parsed
         parsed_value = 0_i64
-        value.each_char do |char|
+        value.to_s.each_char do |char|
           parsed_value *= 256
           parsed_value += char.ord
         end
@@ -60,6 +99,10 @@ module MySQL
     struct Null < Value
       def parsed
         nil
+      end
+
+      def to_mysql
+        "NULL"
       end
 
       def account_for_zero
@@ -85,7 +128,7 @@ module MySQL
       # Date & Time values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP => Datetime,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME => Datetime,
-      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE => Date,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE => SqlDate,
 
       # Bit values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT => Bit,
