@@ -6,6 +6,8 @@ Fork of https://github.com/farleyknight/crystal-mysql
 
 Basic MySQL bindings for Crystal.
 
+CAUTION: Pre-alpha quality. Don't use for anything serious. Any bug reports and feedback are warmly welcome!
+
 ## Installation
 
 Add it to your `Projectfile`
@@ -115,7 +117,16 @@ conn.close
 | Connection#rollback_transaction | Yes          |
 | Connection#transaction          | Yes          |
 | Connection#close                | Yes          |
-| Query                           | No           |
+| Query#to_mysql                  | Yes          |
+| Query#run                       | Yes          |
+
+## TODO
+
+- Support more types: Boolean, Enum, Set, Blob, Geometry, Binary strings
+- Figure out utf-8 (and other collations) support
+- Set up CI for different versions of mysql, ie: 5.5, 5.6, 5.7
+- Set up CI for mac os x
+- Figure out 32bit support?
 
 ## Contributing
 
