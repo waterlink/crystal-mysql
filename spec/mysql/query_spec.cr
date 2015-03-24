@@ -19,35 +19,29 @@ module MySQL
         end
 
         it "replaces them if they are resolved" do
-          Query.new(
-            %{SELECT * FROM user WHERE updated_at > :activity_filter},
-            {
-              "activity_filter" => "25.02.15 00:00:00",
-            },
-          ).to_mysql
+          Query.new(%{SELECT * FROM user WHERE updated_at > :activity_filter},
+                    { "activity_filter" => "25.02.15 00:00:00" }).to_mysql
             .should eq(%{SELECT * FROM user WHERE updated_at > '25.02.15 00:00:00'})
         end
 
         it "works with multiple arguments too" do
-          Query.new(
-            %{SELECT * FROM event WHERE kind = :event_kind AND priority > :event_priority},
-            {
-              "event_kind" => "message",
-              "event_priority" => 35,
-            },
-          ).to_mysql
+          Query.new(%{SELECT * FROM event WHERE kind = :event_kind AND priority > :event_priority},
+                    { "event_kind" => "message",
+                      "event_priority" => 35}).to_mysql
             .should eq(%{SELECT * FROM event WHERE kind = 'message' AND priority > 35})
         end
 
         it "works with arguments specified more than once too" do
-          Query.new(
-            %{SELECT * FROM event WHERE kind = :event_kind AND priority > :event_priority AND low_priority <= :event_priority AND exact_priority = :event_priority AND foreign_kind <> :event_kind},
-            {
-              "event_kind" => "message",
-              "event_priority" => 35,
-            },
-          ).to_mysql
+          Query.new(%{SELECT * FROM event WHERE kind = :event_kind AND priority > :event_priority AND low_priority <= :event_priority AND exact_priority = :event_priority AND foreign_kind <> :event_kind},
+                    { "event_kind" => "message",
+                      "event_priority" => 35 }).to_mysql
             .should eq(%{SELECT * FROM event WHERE kind = 'message' AND priority > 35 AND low_priority <= 35 AND exact_priority = 35 AND foreign_kind <> 'message'})
+        end
+
+        it "works with parameter values that contain `:` themselves" do
+          Query.new(%{SELECT :a},
+                    { "a" => "hello :a world" }).to_mysql
+            .should eq(%{SELECT 'hello :a world'})
         end
       end
     end
