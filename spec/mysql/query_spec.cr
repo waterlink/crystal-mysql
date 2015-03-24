@@ -2,6 +2,10 @@ require "../spec_helper"
 
 module MySQL
   describe Query do
+    connected = -> {
+      MySQL.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+    }
+
     describe "#to_mysql" do
       it "equals to its value in simple case" do
         Query.new(%{SELECT 1}).to_mysql.should eq(%{SELECT 1})
@@ -84,6 +88,21 @@ module MySQL
       it "escapes nasty string values" do
         Query.new(%{SELECT :a}, {"a" => "'; DROP TABLE user; --"}).to_mysql
           .should eq(%{SELECT '\\'; DROP TABLE user; --'})
+      end
+    end
+
+    describe "#run" do
+      it "runs simple query" do
+        Query.new(%{SELECT 1, 2, 3, 'hello world'}).run(connected.call)
+          .should eq([[1, 2, 3, "hello world"]])
+      end
+
+      it "runs simple query with parameters" do
+        Query.new(%{SELECT :a, :b, :a, :c, :b},
+                  { "a" => "hello world",
+                    "b" => 42.33,
+                    "c" => nil }).run(connected.call)
+          .should eq([["hello world", 42.33, "hello world", nil, 42.33]])
       end
     end
   end

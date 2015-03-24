@@ -15,6 +15,10 @@ module MySQL
       }
     end
 
+    def run(connection)
+      connection.query(to_mysql)
+    end
+
     private def required_params
       @_required_params ||= @value.scan(PARAM_REGEX).map { |m| m[1] }
     end
