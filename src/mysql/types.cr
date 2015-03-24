@@ -1,6 +1,18 @@
 module MySQL
   module Types
-    alias SqlType = String|Time|Int32|Int64|Float64|Nil
+    struct Date
+      property time
+
+      def initialize(time : Time)
+        @time = time.date
+      end
+
+      def to_s
+        TimeFormat.new("%F").format(time)
+      end
+    end
+
+    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date
     IGNORE_FIELD = LibMySQL::MySQLField.new
 
     struct Value
@@ -27,6 +39,7 @@ module MySQL
       end
 
       def lift
+        return self unless self.is_a?(Value)
         VALUE_DISPATCH.fetch(field.field_type) { Value }.new(value, field)
       end
 
@@ -37,7 +50,6 @@ module MySQL
       private def lift_down_class(value : Nil) Null end
       private def lift_down_class(value : Int) Integer end
       private def lift_down_class(value : ::Float) Float end
-      private def lift_down_class(value : Time) Datetime end
       private def lift_down_class(value) Value end
     end
 
@@ -47,7 +59,7 @@ module MySQL
       end
     end
 
-    struct Date < Value
+    struct SqlDate < Value
       def parsed
         TimeFormat.new("%F").parse(value.to_s)
       end
@@ -55,7 +67,7 @@ module MySQL
 
     struct Integer < Value
       def parsed
-        value.to_i
+        value.to_s.to_i
       end
 
       def to_mysql
@@ -116,7 +128,7 @@ module MySQL
       # Date & Time values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_TIMESTAMP => Datetime,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_DATETIME => Datetime,
-      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE => Date,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_DATE => SqlDate,
 
       # Bit values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT => Bit,

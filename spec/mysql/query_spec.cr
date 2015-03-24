@@ -67,6 +67,14 @@ module MySQL
                   }).to_mysql.should eq(%{SELECT '2005-03-27 02:00:00'})
       end
 
+      it "works with date (kinda)" do
+        time = TimeFormat.new("%F %T").parse("2005-03-27 02:00:00")
+        date = Types::Date.new(time)
+        Query.new(%{SELECT :a}, {
+                    "a" => date,
+                  }).to_mysql.should eq(%{SELECT '2005-03-27'})
+      end
+
       it "works with nil" do
         Query.new(%{SELECT :a}, {"a" => nil}).to_mysql.should eq(%{SELECT NULL})
       end
