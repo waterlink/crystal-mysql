@@ -71,5 +71,12 @@ module MySQL
         Query.new(%{SELECT :a}, {"a" => nil}).to_mysql.should eq(%{SELECT NULL})
       end
     end
+
+    describe "escapes strings properly" do
+      it "escapes nasty string values" do
+        Query.new(%{SELECT :a}, {"a" => "'; DROP TABLE user; --"}).to_mysql
+          .should eq(%{SELECT '\\'; DROP TABLE user; --'})
+      end
+    end
   end
 end

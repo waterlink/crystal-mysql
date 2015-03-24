@@ -23,7 +23,7 @@ module MySQL
       end
 
       def to_mysql
-        "'#{value.to_s}'"
+        "'#{Support.escape_string(value.to_s)}'"
       end
 
       def lift
@@ -34,11 +34,11 @@ module MySQL
         lift_down_class(value).new(value, field)
       end
 
-      def lift_down_class(value : Nil) Null end
-      def lift_down_class(value : Int) Integer end
-      def lift_down_class(value : ::Float) Float end
-      def lift_down_class(value : Time) Datetime end
-      def lift_down_class(value) Value end
+      private def lift_down_class(value : Nil) Null end
+      private def lift_down_class(value : Int) Integer end
+      private def lift_down_class(value : ::Float) Float end
+      private def lift_down_class(value : Time) Datetime end
+      private def lift_down_class(value) Value end
     end
 
     struct Datetime < Value
