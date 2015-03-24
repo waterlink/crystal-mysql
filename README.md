@@ -44,6 +44,21 @@ conn.query(%{SELECT * FROM user}) #=> [[1, "john@example.com", "John Smith"], [2
 conn.query(%{DROP TABLE user})
 ```
 
+### Using higher level Query api
+
+```crystal
+Query
+  .new(%{SELECT * FROM user WHERE created_at > :from_filter},
+       { "from_filter" => 14.days.ago })
+  .run(conn)
+```
+
+You can reference parameters in query with symbol-like syntax: `:some_symbol_like_syntax` or `:someSymbolLikeSyntax`. And then you can resolve these references with passing a hash as a second argument, which specifies values for these parameters.
+
+By the way all strings get properly escaped, so no SQL injections should be possible (if something is not escaped properly, then it is a bug, and you should probably report it here on github).
+
+You can reference the same symbol multiple times in one query, as well you can use as much symbols as you want.
+
 ### Making a transaction
 
 ```crystal
