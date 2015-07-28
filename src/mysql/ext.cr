@@ -1,5 +1,10 @@
 @[Link("mysqlclient_r")]
 lib LibMySQL
+  alias MySQLString = UInt8*
+  alias MySQLRow = MySQLString
+  alias MySQLULong = UInt64
+  alias MySQLUInt = UInt32
+
   struct MySQL
     # Look inside the file:
     #
@@ -15,16 +20,13 @@ lib LibMySQL
     # In that case, I'm leave the struct blank
     # unless it's otherwise necessary to provide
     # more info.
+    stub: MySQLUInt
   end
 
   struct MySQLRes
     # Empty for the moment
+    stub: MySQLUInt
   end
-
-  alias MySQLString = UInt8*
-  alias MySQLRow = MySQLString
-  alias MySQLULong = UInt64
-  alias MySQLUInt = UInt32
 
   enum MySQLFieldType
     MYSQL_TYPE_DECIMAL
