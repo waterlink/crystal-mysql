@@ -5,6 +5,7 @@ module MySQL
     class NotConnected < Base; end
     class NotImplementedType < Base; end
     class MissingParameter < Base; end
+    class UnableToFetchLastInsertId < Base; end
 
     class UnableToRollbackTransaction < Base
       def initialize(original_error, error)
