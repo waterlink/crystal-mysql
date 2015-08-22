@@ -31,6 +31,11 @@ module MySQL
       end
 
       def parsed
+        return nil if value == ""
+        _parsed
+      end
+
+      def _parsed
         value
       end
 
@@ -55,19 +60,19 @@ module MySQL
     end
 
     struct Datetime < Value
-      def parsed
+      def _parsed
         TimeFormat.new("%F %T").parse(value.to_s)
       end
     end
 
     struct SqlDate < Value
-      def parsed
+      def _parsed
         TimeFormat.new("%F").parse(value.to_s)
       end
     end
 
     struct Integer < Value
-      def parsed
+      def _parsed
         value.to_s.to_i
       end
 
@@ -77,7 +82,7 @@ module MySQL
     end
 
     struct Float < Value
-      def parsed
+      def _parsed
         value.to_s.to_f
       end
 
@@ -87,7 +92,7 @@ module MySQL
     end
 
     struct Bit < Value
-      def parsed
+      def _parsed
         parsed_value = 0_i64
         value.to_s.each_char do |char|
           parsed_value *= 256
@@ -104,7 +109,7 @@ module MySQL
     end
 
     struct Null < Value
-      def parsed
+      def _parsed
         nil
       end
 
