@@ -164,6 +164,14 @@ lib LibMySQL
 
   fun store_result = mysql_store_result(mysql : MySQL*) : MySQLRes*
 
+  # Returns the value generated for an AUTO_INCREMENT column by the previous
+  # INSERT or UPDATE statement. Use this function after you have performed an
+  # INSERT statement into a table that contains an AUTO_INCREMENT field, or
+  # have used INSERT or UPDATE to set a column value with
+  # LAST_INSERT_ID(expr).
+
+  fun insert_id = mysql_insert_id(mysql : MySQL*) : MySQLULong
+
   # Retrieves the next row of a result set. When used after
   # mysql_store_result(), mysql_fetch_row() returns NULL when there
   # are no more rows to retrieve. When used after mysql_use_result(),

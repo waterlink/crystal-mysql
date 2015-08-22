@@ -59,6 +59,40 @@ module MySQL
       end
     end
 
+    describe "#insert_id" do
+      it "works with simple insert query" do
+        conn = connected.call
+
+        conn.query(%{DROP TABLE IF EXISTS event})
+        conn.query(%{CREATE TABLE event (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, created_on DATE, what VARCHAR(50))})
+
+        conn.query(%{INSERT INTO event(created_on, what) values('2005-03-27', 'order')})
+        conn.insert_id.should eq(1)
+
+        conn.query(%{INSERT INTO event(created_on, what) values('2005-04-05', 'shipment')})
+        conn.insert_id.should eq(2)
+
+        conn.query(%{INSERT INTO event(created_on, what) values('2005-06-14', 'return')})
+        conn.insert_id.should eq(3)
+
+        conn.query(%{SELECT * FROM event})
+          .should eq([
+                      [1, TimeFormat.new("%F").parse("2005-03-27"), "order"],
+                      [2, TimeFormat.new("%F").parse("2005-04-05"), "shipment"],
+                      [3, TimeFormat.new("%F").parse("2005-06-14"), "return"],
+                     ])
+      end
+
+      it "does not work if query was not insert" do
+        conn = connected.call
+
+        conn.query("SELECT 1")
+        expect_raises(Errors::UnableToFetchLastInsertId) do
+          conn.insert_id.should eq(0)
+        end
+      end
+    end
+
     describe "#query" do
       it "works with simple query" do
         connected.call.query("SELECT 1").should eq([[1]])

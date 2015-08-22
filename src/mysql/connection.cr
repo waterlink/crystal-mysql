@@ -77,6 +77,14 @@ module MySQL
       @connected = nil
     end
 
+    def insert_id
+      id = LibMySQL.insert_id(@handle)
+      if id == 0
+        raise Errors::UnableToFetchLastInsertId.new("Probably AUTOINCREMENT did not take place in last query")
+      end
+      id
+    end
+
     # @non-threadsafe!
     def query(query_string)
       unless @connected
