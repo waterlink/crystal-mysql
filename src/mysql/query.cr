@@ -3,7 +3,7 @@ module MySQL
     property value
     property params
 
-    PARAM_REGEX = %r{:([a-z_][a-zA-Z_0-9]*)}
+    PARAM_REGEX = %r{:([a-zA-Z_0-9]+)}
 
     def initialize(@value, @params={} of Symbol => MySQL::Types::SqlType)
       require_params!

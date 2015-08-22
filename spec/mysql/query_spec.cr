@@ -43,6 +43,12 @@ module MySQL
                     { "a" => "hello :a world" }).to_mysql
             .should eq(%{SELECT 'hello :a world'})
         end
+
+        it "works with parameter names being numbers" do
+          Query.new(%{SELECT :35},
+                    { "35" => 21 }).to_mysql
+            .should eq(%{SELECT 21})
+        end
       end
     end
 
