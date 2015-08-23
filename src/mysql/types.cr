@@ -20,9 +20,6 @@ module MySQL
       property field
 
       def initialize(@value, @field)
-        if value.is_a?(String)
-          @value = value.gsub(/\0/, "")
-        end
       end
 
       def initialize(@value)
@@ -34,7 +31,6 @@ module MySQL
       end
 
       def parsed
-        return nil if value == ""
         _parsed
       end
 

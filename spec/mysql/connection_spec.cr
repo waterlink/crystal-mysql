@@ -257,6 +257,23 @@ module MySQL
           subject.call.query("SELECT 1")
         end
       end
+
+      it "works correctly with NULL values" do
+        conn = connected.call
+        conn.query(%{DROP TABLE IF EXISTS people})
+        conn.query(%{CREATE TABLE people (id INT, name VARCHAR(50), note VARCHAR(50), score INT)})
+
+        conn.query(%{INSERT INTO people VALUES(546, NULL, NULL, 3)})
+        conn.query(%{INSERT INTO people VALUES(547, 'maria', '', 3)})
+        conn.query(%{INSERT INTO people VALUES(548, 'maria', NULL, 3)})
+
+        conn.query(%{SELECT * FROM people})
+          .should eq([
+            [546, nil, nil, 3],
+            [547, "maria", "", 3],
+            [548, "maria", nil, 3],
+          ])
+      end
     end
 
     describe "#close" do

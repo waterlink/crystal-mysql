@@ -7,19 +7,6 @@ module MySQL
   # concurrency is needed, then each concurrent task should own its own
   # connection.
   class Connection
-    struct ValueReader
-      property value :: Types::SqlType
-      property start
-
-      def initialize(@value, @start)
-      end
-
-      def initialize
-        @value = ""
-        @start = 0
-      end
-    end
-
     def initialize
       @handle = LibMySQL.init(nil)
       @connected = false
@@ -120,11 +107,9 @@ module MySQL
       return nil if row.nil?
 
       lengths = lengths_from(result, fields)
-      reader = ValueReader.new
       row_list = [] of Types::SqlType
       fields.each_with_index do |field, index|
-        reader = fetch_value(field, row, reader, lengths[index])
-        row_list << reader.value
+        row_list << fetch_value(field, row[index], lengths[index])
       end
 
       row_list
@@ -139,14 +124,10 @@ module MySQL
       lengths
     end
 
-    private def fetch_value(field, source, reader, len)
-      value = Support.string_from_uint8(source[0] + reader.start, len)
-
-      lifted = Types::Value.new(value, field).lift
-
-      reader.start += len + lifted.account_for_zero
-      reader.value = lifted.parsed
-      reader
+    private def fetch_value(field, source, len)
+      return nil if source.null?
+      value = Support.string_from_uint8(source, len)
+      Types::Value.new(value, field).lift.parsed
     end
   end
 end
