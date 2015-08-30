@@ -93,11 +93,7 @@ module MySQL
         rows << row
       end
 
-      # NOTE: Why this happens here:
-      # *** Error in `/tmp/crystal-run-spec.CAKQ1K': double free or corruption (out): 0x00000000008fa040 ***
-      # NOTE: Probably because if result is already exhausted, it just frees itself
-      #       That means, that this thing is only useful for #lazy_query
-      #LibMySQL.free_result(result)
+      LibMySQL.free_result(result)
 
       rows
     end
