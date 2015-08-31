@@ -285,6 +285,8 @@ module MySQL
 
       it "works with UTF8 characters" do
         conn = connected.call
+        conn.set_option(LibMySQL::MySQLOption::MYSQL_SET_CHARSET_NAME, "utf8")
+
         conn.query(%{DROP TABLE IF EXISTS people})
         conn.query(%{CREATE TABLE people (id INT, name VARCHAR(50), note VARCHAR(50), score INT)})
 
