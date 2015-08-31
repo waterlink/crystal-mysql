@@ -283,7 +283,7 @@ module MySQL
           ])
       end
 
-      it "works with UTF8 characters" do
+      pending "works with UTF8 characters" do
         conn = connected.call
         conn.set_option(LibMySQL::MySQLOption::MYSQL_SET_CHARSET_NAME, "utf8")
 
