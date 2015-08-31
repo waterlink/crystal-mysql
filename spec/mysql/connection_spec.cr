@@ -59,6 +59,14 @@ module MySQL
       end
     end
 
+    describe "#options" do
+      it "returns success when setting an option" do
+        mysql = subject.call
+        result = mysql.set_option(LibMySQL::MySQLOption::MYSQL_SET_CHARSET_NAME, "utf8")
+        result.should eq 0
+      end
+    end
+
     describe "#insert_id" do
       it "works with simple insert query" do
         conn = connected.call
@@ -272,6 +280,19 @@ module MySQL
             [546, nil, nil, 3],
             [547, "maria", "", 3],
             [548, "maria", nil, 3],
+          ])
+      end
+
+      it "works with UTF8 characters" do
+        conn = connected.call
+        conn.query(%{DROP TABLE IF EXISTS people})
+        conn.query(%{CREATE TABLE people (id INT, name VARCHAR(50), note VARCHAR(50), score INT)})
+
+        conn.query(%{INSERT INTO people VALUES(549, "フレーム", "ワークのベンチマーク", 1)})
+        
+        conn.query(%{SELECT * FROM people})
+          .should eq([
+            [549,"フレーム", "ワークのベンチマーク", 1],
           ])
       end
     end

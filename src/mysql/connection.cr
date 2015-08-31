@@ -12,6 +12,12 @@ module MySQL
       @connected = false
     end
 
+    def set_option (option : LibMySQL::MySQLOption, value : String)
+        result = LibMySQL.options(@handle, option, value)
+        raise Errors::Connection.new(error) unless result
+        result
+    end
+
     def client_info
       String.new LibMySQL.client_info
     end
@@ -31,6 +37,7 @@ module MySQL
         raise Errors::Connection.new("Unreachable code")
       end
 
+      
       self
     end
 
