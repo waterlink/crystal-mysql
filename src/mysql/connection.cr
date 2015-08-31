@@ -36,7 +36,6 @@ module MySQL
       else
         raise Errors::Connection.new("Unreachable code")
       end
-
       
       self
     end
@@ -90,9 +89,9 @@ module MySQL
       result = LibMySQL.store_result(@handle)
       return nil if result.nil?
 
-      fields = [] of LibMySQL::MySQLField
+      fields = [] of LibMySQL::MySQLField*
       while field = LibMySQL.fetch_field(result)
-        fields << field.value
+        fields << field
       end
 
       rows = [] of Array(Types::SqlType)

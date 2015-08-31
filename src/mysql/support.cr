@@ -8,8 +8,8 @@ module MySQL
       String.new(new)
     end
 
-    def self.string_from_uint8(s, len)
-      String.new(s, len)
+    def self.string_from_uint8(chars, len)
+      String.new(chars, len)
     end
   end
 end
