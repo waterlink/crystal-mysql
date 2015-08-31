@@ -1,4 +1,4 @@
-@[Link("mysqlclient_r")]
+@[Link("mysqlclient")]
 lib LibMySQL
   alias MySQLString = UInt8*
   alias MySQLRow = MySQLString
@@ -58,6 +58,34 @@ lib LibMySQL
     MYSQL_TYPE_GEOMETRY=255
   end
 
+  enum MySQLOption
+    MYSQL_OPT_CONNECT_TIMEOUT
+    MYSQL_OPT_COMPRESS
+    MYSQL_OPT_NAMED_PIPE
+    MYSQL_INIT_COMMAND
+    MYSQL_READ_DEFAULT_FILE
+    MYSQL_READ_DEFAULT_GROUP
+    MYSQL_SET_CHARSET_DIR
+    MYSQL_SET_CHARSET_NAME
+    MYSQL_OPT_LOCAL_INFILE
+    MYSQL_OPT_PROTOCOL
+    MYSQL_SHARED_MEMORY_BASE_NAME
+    MYSQL_OPT_READ_TIMEOUT
+    MYSQL_OPT_WRITE_TIMEOUT
+    MYSQL_OPT_USE_RESULT
+    MYSQL_OPT_USE_REMOTE_CONNECTION
+    MYSQL_OPT_USE_EMBEDDED_CONNECTION
+    MYSQL_OPT_GUESS_CONNECTION
+    MYSQL_SET_CLIENT_IP
+    MYSQL_SECURE_AUTH
+    MYSQL_REPORT_DATA_TRUNCATION
+    MYSQL_OPT_RECONNECT
+    MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+    MYSQL_PLUGIN_DIR
+    MYSQL_DEFAULT_AUTH
+    MYSQL_ENABLE_CLEARTEXT_PLUGIN
+  end
+
   struct MySQLField
     name: MySQLString
     org_name: MySQLString
@@ -97,6 +125,17 @@ lib LibMySQL
   # called to close the connection.
 
   fun init          = mysql_init(m : MySQL*) : MySQL*
+
+  # Provides the ability to set MySQL options.
+  #
+  # Arguments:
+  #
+  # * mysql_option The list of options is an Enumerable LibMySQL::MySQLOption.
+  # * value - A String that represents tye value of the option.
+  
+  fun options       = mysql_options(mysql        : MySQL*,  
+                                    mysql_option : MySQLOption,
+                                    value        : UInt8*) : Int32
 
   # mysql_real_connect() attempts to establish a connection to a MySQL database
   # engine running on host. mysql_real_connect() must complete successfully before
