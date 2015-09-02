@@ -8,14 +8,14 @@ module MySQL
   # connection.
   class Connection
     def initialize
-      @handle = LibMySQL.init(nil)
+      @handle = LibMySQL.init(Pointer(LibMySQL::MySQL).null)
       @connected = false
     end
 
-    def set_option (option : LibMySQL::MySQLOption, value : String)
-        result = LibMySQL.options(@handle, option, value)
-        raise Errors::Connection.new(error) unless result
-        result
+    def set_option(option : LibMySQL::MySQLOption, value : String)
+      result = LibMySQL.options(@handle, option, value)
+      raise Errors::Connection.new(error) unless result
+      result
     end
 
     def client_info
@@ -84,10 +84,10 @@ module MySQL
         raise Errors::NotConnected.new
       end
 
-      code = LibMySQL.query(@handle, query_string)
+      code = LibMySQL.query(@handle, query_string.cstr)
       raise Errors::Query.new(error, query_string) if code != 0
       result = LibMySQL.store_result(@handle)
-      return nil if result.nil?
+      return nil if result.null?
 
       fields = [] of LibMySQL::MySQLField*
       while field = LibMySQL.fetch_field(result)
