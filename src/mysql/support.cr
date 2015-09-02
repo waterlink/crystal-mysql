@@ -9,7 +9,7 @@ module MySQL
     end
 
     def self.string_from_uint8(s, len)
-      (0_u32...len).inject("") { |acc, i| acc + s[i].chr }
+      String.new(s, len)
     end
   end
 end
