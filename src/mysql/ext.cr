@@ -4,29 +4,8 @@ lib LibMySQL
   alias MySQLRow = MySQLString
   alias MySQLULong = UInt64
   alias MySQLUInt = UInt32
-
-  struct MySQL
-    # Look inside the file:
-    #
-    #   /usr/local/include/mysql/mysql.h
-    #
-    # and you'll find lots of gory details
-    # about the struct `st_mysql`.
-    #
-    # However, it seems that the MySQL C API
-    # was designed for you *not* to touch it's
-    # internals in any way.
-    #
-    # In that case, I'm leave the struct blank
-    # unless it's otherwise necessary to provide
-    # more info.
-    stub: MySQLUInt
-  end
-
-  struct MySQLRes
-    # Empty for the moment
-    stub: MySQLUInt
-  end
+  alias MySQL = Void
+  alias MySQLRes = Void
 
   enum MySQLFieldType
     MYSQL_TYPE_DECIMAL
@@ -113,6 +92,8 @@ lib LibMySQL
     charsetnr: MySQLUInt
 
     field_type: MySQLFieldType
+
+    extension: Void*
   end
 
   # Allocates or initializes a MYSQL object suitable for mysql_real_connect().

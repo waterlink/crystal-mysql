@@ -13,7 +13,9 @@ module MySQL
     end
 
     alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date|Bool
-    IGNORE_FIELD = LibMySQL::MySQLField.new
+
+    IGNORE_FIELD_RAW = LibMySQL::MySQLField.new
+    IGNORE_FIELD = pointerof(IGNORE_FIELD_RAW)
 
     struct Value
       property value
@@ -44,7 +46,7 @@ module MySQL
 
       def lift
         return self unless self.is_a?(Value)
-        VALUE_DISPATCH.fetch(field.field_type) { Value }.new(value, field)
+        VALUE_DISPATCH.fetch(field.value.field_type) { Value }.new(value, field)
       end
 
       def lift_down
