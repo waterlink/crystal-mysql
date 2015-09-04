@@ -116,7 +116,7 @@ lib LibMySQL
   
   fun options       = mysql_options(mysql        : MySQL*,  
                                     mysql_option : MySQLOption,
-                                    value        : UInt8*) : Int32
+                                    value        : Void*) : Int32
 
   # mysql_real_connect() attempts to establish a connection to a MySQL database
   # engine running on host. mysql_real_connect() must complete successfully before

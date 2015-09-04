@@ -13,6 +13,14 @@ module MySQL
     end
 
     def set_option(option : LibMySQL::MySQLOption, value : String)
+      set_option(option, value.cstr as Void*)
+    end
+
+    def set_option(option : LibMySQL::MySQLOption, value : Bool)
+      set_option(option, pointerof(value))
+    end
+
+    def set_option(option : LibMySQL::MySQLOption, value)
       result = LibMySQL.options(@handle, option, value)
       raise Errors::Connection.new(error) unless result
       result
