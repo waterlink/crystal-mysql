@@ -13,7 +13,7 @@ module MySQL
     end
 
     def set_option(option : LibMySQL::MySQLOption, value : String)
-      set_option(option, value.cstr as Void*)
+      set_option(option, value.cstr)
     end
 
     def set_option(option : LibMySQL::MySQLOption, value : Bool)
@@ -21,7 +21,7 @@ module MySQL
     end
 
     def set_option(option : LibMySQL::MySQLOption, value)
-      result = LibMySQL.options(@handle, option, value)
+      result = LibMySQL.options(@handle, option, value as Void*)
       raise Errors::Connection.new(error) unless result
       result
     end
