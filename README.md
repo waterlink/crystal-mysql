@@ -10,12 +10,13 @@ CAUTION: Pre-alpha quality. Don't use for anything serious. Any bug reports and 
 
 ## Installation
 
-Add it to your `Projectfile`
+Add it to your `shard.yml`
 
-```crystal
-deps do
-  github "waterlink/crystal-mysql"
-end
+```yaml
+dependencies:
+  mysql:
+    github: waterlink/crystal-mysql
+    branch: master
 ```
 
 ## Usage
