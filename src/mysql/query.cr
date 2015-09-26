@@ -33,7 +33,7 @@ module MySQL
 
     private def replace(s, name, value)
       result = ""
-      len = name.length
+      len = name.size
       p0 = 0
       while p1 = s.index(name, p0)
         result += s[p0...p1]

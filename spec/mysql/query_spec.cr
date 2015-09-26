@@ -67,12 +67,12 @@ module MySQL
 
       it "works with time" do
         Query.new(%{SELECT :a}, {
-                    "a" => TimeFormat.new("%F %T").parse("2005-03-27 02:00:00"),
+                    "a" => Time::Format.new("%F %T").parse("2005-03-27 02:00:00"),
                   }).to_mysql.should eq(%{SELECT '2005-03-27 02:00:00'})
       end
 
       it "works with date (kinda)" do
-        time = TimeFormat.new("%F %T").parse("2005-03-27 02:00:00")
+        time = Time::Format.new("%F %T").parse("2005-03-27 02:00:00")
         date = Types::Date.new(time)
         Query.new(%{SELECT :a}, {
                     "a" => date,

@@ -8,7 +8,7 @@ module MySQL
       end
 
       def to_s
-        TimeFormat.new("%F").format(time)
+        Time::Format.new("%F").format(time)
       end
     end
 
@@ -62,13 +62,13 @@ module MySQL
 
     struct Datetime < Value
       def _parsed
-        TimeFormat.new("%F %T").parse(value.to_s)
+        Time::Format.new("%F %T").parse(value.to_s)
       end
     end
 
     struct SqlDate < Value
       def _parsed
-        TimeFormat.new("%F").parse(value.to_s)
+        Time::Format.new("%F").parse(value.to_s)
       end
     end
 

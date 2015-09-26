@@ -3,13 +3,13 @@ module MySQL
     EMPTY_HANDLE = LibMySQL.init(Pointer(LibMySQL::MySQL).null)
 
     def self.escape_string(original)
-      length = original.length.to_u32
+      size = original.size.to_u32
 
       # According to docs here: https://dev.mysql.com/doc/refman/5.5/en/mysql-real-escape-string.html
-      # One would need to allocate at least length*2+1
-      escaped = Pointer(UInt8).malloc(length*2+1)
+      # One would need to allocate at least size*2+1
+      escaped = Pointer(UInt8).malloc(size*2+1)
 
-      LibMySQL.escape_string(EMPTY_HANDLE, escaped, original, original.length.to_u32)
+      LibMySQL.escape_string(EMPTY_HANDLE, escaped, original, size)
       String.new(escaped)
     end
 

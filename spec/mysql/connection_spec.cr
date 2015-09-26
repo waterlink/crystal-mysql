@@ -85,9 +85,9 @@ module MySQL
 
         conn.query(%{SELECT * FROM event})
           .should eq([
-                      [1, TimeFormat.new("%F").parse("2005-03-27"), "order"],
-                      [2, TimeFormat.new("%F").parse("2005-04-05"), "shipment"],
-                      [3, TimeFormat.new("%F").parse("2005-06-14"), "return"],
+                      [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
+                      [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
+                      [3, Time::Format.new("%F").parse("2005-06-14"), "return"],
                      ])
       end
 
@@ -121,8 +121,8 @@ module MySQL
 
         conn.query(%{SELECT * FROM event})
           .should eq([
-                      [1, TimeFormat.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
-                      [2, TimeFormat.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+                      [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+                      [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
                      ])
       end
 
@@ -136,8 +136,8 @@ module MySQL
 
         conn.query(%{SELECT * FROM event})
           .should eq([
-                      [1, TimeFormat.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
-                      [2, TimeFormat.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+                      [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+                      [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
                      ])
       end
 
@@ -151,8 +151,8 @@ module MySQL
 
         conn.query(%{SELECT * FROM event})
           .should eq([
-                      [1, TimeFormat.new("%F").parse("2005-03-27"), "order"],
-                      [2, TimeFormat.new("%F").parse("2005-04-05"), "shipment"],
+                      [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
+                      [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
                      ])
       end
 
