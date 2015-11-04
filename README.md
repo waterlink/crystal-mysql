@@ -16,7 +16,7 @@ Add it to your `shard.yml`
 dependencies:
   mysql:
     github: waterlink/crystal-mysql
-    branch: master
+    version: 0.2.1
 ```
 
 ## Usage
