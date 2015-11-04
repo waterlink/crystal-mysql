@@ -57,12 +57,17 @@ module MySQL
       private def lift_down_class(value : Bool) Boolean end
       private def lift_down_class(value : Int) Integer end
       private def lift_down_class(value : ::Float) Float end
+      private def lift_down_class(value : Time) Datetime end
       private def lift_down_class(value) Value end
     end
 
     struct Datetime < Value
       def _parsed
-        Time::Format.new("%F %T").parse(value.to_s)
+        Time::Format.new("%F %T").parse(value.to_s, Time::Kind::Utc)
+      end
+
+      def to_mysql
+        "'#{(value as Time).to_utc.to_s}'"
       end
     end
 
