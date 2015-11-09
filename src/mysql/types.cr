@@ -109,6 +109,11 @@ module MySQL
     end
 
     struct Boolean < Value
+      def _parsed
+        return true if value == "1"
+        false
+      end
+
       def to_mysql
         value ? "TRUE" : "FALSE"
       end
@@ -130,7 +135,6 @@ module MySQL
 
     VALUE_DISPATCH = {
       # Integer values
-      LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY => Integer,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT => Integer,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG => Integer,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG => Integer,
@@ -150,6 +154,9 @@ module MySQL
 
       # Bit values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_BIT => Bit,
+
+      # Bool values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY => Boolean,
 
       # NULL values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL => Null,

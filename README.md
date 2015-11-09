@@ -101,6 +101,10 @@ Nested transactions are possible.
 conn.close
 ```
 
+## Notes
+
+* This library assumes `tinyint` is used as `boolean` type.
+
 ## High-level API roadmap
 
 | High level method               | Implemented? |

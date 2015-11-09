@@ -234,8 +234,8 @@ module MySQL
 
         conn.query(%{SELECT * FROM user})
           .should eq([
-                      [1, "john@example.org", 1],
-                      [2, "sarah@example.org", 0],
+                      [1, "john@example.org", true],
+                      [2, "sarah@example.org", false],
                      ])
       end
 
