@@ -87,6 +87,16 @@ module MySQL
       end
     end
 
+    struct BigInteger < Value
+      def _parsed
+        value.to_s.to_i64
+      end
+
+      def to_mysql
+        value.to_s
+      end
+    end
+
     struct Float < Value
       def _parsed
         value.to_s.to_f
@@ -137,7 +147,7 @@ module MySQL
       # Integer values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_SHORT => Integer,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG => Integer,
-      LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG => Integer,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_LONGLONG => BigInteger,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_INT24 => Integer,
       LibMySQL::MySQLFieldType::MYSQL_TYPE_YEAR => Integer,
 
