@@ -13,7 +13,7 @@ module MySQL
     end
 
     def set_option(option : LibMySQL::MySQLOption, value : String)
-      set_option(option, value.cstr)
+      set_option(option, value.to_unsafe)
     end
 
     def set_option(option : LibMySQL::MySQLOption, value : Bool)
@@ -92,7 +92,7 @@ module MySQL
         raise Errors::NotConnected.new
       end
 
-      code = LibMySQL.query(@handle, query_string.cstr)
+      code = LibMySQL.query(@handle, query_string.to_unsafe)
       raise Errors::Query.new(error, query_string) if code != 0
       result = LibMySQL.store_result(@handle)
       return nil if result.null?
