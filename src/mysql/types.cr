@@ -67,7 +67,7 @@ module MySQL
       end
 
       def to_mysql
-        "'#{(value as Time).to_utc.to_s}'"
+        %{'#{(value as Time).to_utc.to_s("%F %T")}'}
       end
     end
 
