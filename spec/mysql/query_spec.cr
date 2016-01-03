@@ -68,7 +68,7 @@ module MySQL
       it "works with time" do
         Query.new(%{SELECT :a}, {
                     "a" => Time::Format.new("%F %T").parse("2005-03-27 02:00:00", Time::Kind::Utc),
-                  }).to_mysql.should eq(%{SELECT '2005-03-27 02:00:00 UTC'})
+                  }).to_mysql.should eq(%{SELECT '2005-03-27 02:00:00'})
       end
 
       it "works with date (kinda)" do
