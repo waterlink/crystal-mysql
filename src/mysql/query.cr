@@ -10,7 +10,7 @@ module MySQL
     end
 
     def to_mysql
-      required_params.inject(@value) { |value, name|
+      required_params.reduce(@value) { |value, name|
         replace(value, ":#{name}", representation(@params[name]))
       }
     end
