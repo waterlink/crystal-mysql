@@ -13,7 +13,7 @@ module MySQL
     }
 
     connected = -> {
-      subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+      subject.call.connect("127.0.0.1", "root", "", "crystal_mysql_test", 3306_u16, nil)
     }
 
     version = -> {

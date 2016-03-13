@@ -3,7 +3,7 @@ require "../spec_helper"
 module MySQL
   describe Query do
     connected = -> {
-      MySQL.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
+      MySQL.connect("127.0.0.1", "root", "", "crystal_mysql_test", 3306_u16, nil)
     }
 
     describe "#to_mysql" do
