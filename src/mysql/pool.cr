@@ -45,10 +45,14 @@ module MySQL
       @queue.size > 0
     end
 
+    def get_connections_left
+      @queue.size
+    end
+
     def get_connection
       @queue_lock.synchronize do
         if !get_connection?
-          raise Errors::ConnectionPoolExhaustedError.new
+          raise Errors::ConnectionPoolExhaustedError.new "MySQL Connection Pool Exhausted"
         end
         cnx = @queue.pop
         PooledConnection.new self, cnx
