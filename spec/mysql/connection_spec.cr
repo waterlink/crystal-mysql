@@ -4,19 +4,19 @@ class TestError < Exception; end
 
 module MySQL
   describe Connection do
-    described_class = -> {
+    described_class = ->{
       Connection
     }
 
-    subject = -> {
+    subject = ->{
       described_class.call.new
     }
 
-    connected = -> {
+    connected = ->{
       subject.call.connect("127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil)
     }
 
-    version = -> {
+    version = ->{
       subject.call.client_info
     }
 
@@ -84,11 +84,11 @@ module MySQL
         conn.insert_id.should eq(3)
 
         conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
-                      [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
-                      [3, Time::Format.new("%F").parse("2005-06-14"), "return"],
-                     ])
+            .should eq([
+          [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
+          [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
+          [3, Time::Format.new("%F").parse("2005-06-14"), "return"],
+        ])
       end
 
       it "does not work if query was not insert" do
@@ -120,10 +120,10 @@ module MySQL
         conn.query(%{INSERT INTO event values(2, '2005-03-27 02:02:00', 'logout')})
 
         conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
-                      [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
-                     ])
+            .should eq([
+          [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+          [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+        ])
       end
 
       it "works with datetime" do
@@ -135,10 +135,10 @@ module MySQL
         conn.query(%{INSERT INTO event values(2, '2005-03-27 02:02:00', 'logout')})
 
         conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
-                      [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
-                     ])
+            .should eq([
+          [1, Time::Format.new("%F %T").parse("2005-03-27 02:00:00"), "login"],
+          [2, Time::Format.new("%F %T").parse("2005-03-27 02:02:00"), "logout"],
+        ])
       end
 
       it "works with date" do
@@ -150,10 +150,10 @@ module MySQL
         conn.query(%{INSERT INTO event values(2, '2005-04-05', 'shipment')})
 
         conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
-                      [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
-                     ])
+            .should eq([
+          [1, Time::Format.new("%F").parse("2005-03-27"), "order"],
+          [2, Time::Format.new("%F").parse("2005-04-05"), "shipment"],
+        ])
       end
 
       it "works with year(4)" do
@@ -165,10 +165,10 @@ module MySQL
         conn.query(%{INSERT INTO event values(2, '89', 'shipment')})
 
         conn.query(%{SELECT * FROM event})
-          .should eq([
-                      [1, 2044, "order"],
-                      [2, 1989, "shipment"],
-                     ])
+            .should eq([
+          [1, 2044, "order"],
+          [2, 1989, "shipment"],
+        ])
       end
 
       it "works with year(2)" do
@@ -181,16 +181,16 @@ module MySQL
 
         if version.call =~ /5\.6/
           conn.query(%{SELECT * FROM event})
-            .should eq([
-                         [1, 2044, "order"],
-                         [2, 1989, "shipment"],
-                       ])
+              .should eq([
+            [1, 2044, "order"],
+            [2, 1989, "shipment"],
+          ])
         else
           conn.query(%{SELECT * FROM event})
-            .should eq([
-                         [1, 44, "order"],
-                         [2, 89, "shipment"],
-                       ])
+              .should eq([
+            [1, 44, "order"],
+            [2, 89, "shipment"],
+          ])
         end
       end
 
@@ -203,10 +203,10 @@ module MySQL
         conn.query(%{INSERT INTO flags values(2, b'1001', 'some interesting stuff')})
 
         conn.query(%{SELECT * FROM flags})
-          .should eq([
-                      [1, 5, "hello"],
-                      [2, 9, "some interesting stuff"],
-                     ])
+            .should eq([
+          [1, 5, "hello"],
+          [2, 9, "some interesting stuff"],
+        ])
       end
 
       it "works with big bit type" do
@@ -218,10 +218,10 @@ module MySQL
         conn.query(%{INSERT INTO flags values(2, b'0100000000100000000000000000000000000000000000000000001000000001', 'some interesting stuff')})
 
         conn.query(%{SELECT * FROM flags})
-          .should eq([
-                      [1, 5, "hello"],
-                      [2, 4620693217682129409, "some interesting stuff"],
-                     ])
+            .should eq([
+          [1, 5, "hello"],
+          [2, 4620693217682129409, "some interesting stuff"],
+        ])
       end
 
       it "works with boolean type" do
@@ -233,16 +233,16 @@ module MySQL
         conn.query(%{INSERT INTO user VALUES(2, "sarah@example.org", FALSE)})
 
         conn.query(%{SELECT * FROM user})
-          .should eq([
-                      [1, "john@example.org", true],
-                      [2, "sarah@example.org", false],
-                     ])
+            .should eq([
+          [1, "john@example.org", true],
+          [2, "sarah@example.org", false],
+        ])
       end
 
       it "works with commands" do
         connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
         connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
-          .should eq(nil)
+                      .should eq(nil)
       end
 
       it "allows to return multiple rows" do
@@ -254,10 +254,10 @@ module MySQL
         conn.query(%{INSERT INTO user(id, email, name) values(2, "sarah@example.com", "Sarah Smith")})
 
         conn.query(%{SELECT * FROM user})
-          .should eq([
-                      [1, "john@example.com", "John Smith"],
-                      [2, "sarah@example.com", "Sarah Smith"],
-                     ])
+            .should eq([
+          [1, "john@example.com", "John Smith"],
+          [2, "sarah@example.com", "Sarah Smith"],
+        ])
       end
 
       it "raises NotConnectedError when client is not connected" do
@@ -276,11 +276,11 @@ module MySQL
         conn.query(%{INSERT INTO people VALUES(548, 'maria', NULL, 3)})
 
         conn.query(%{SELECT * FROM people})
-          .should eq([
-            [546, nil, nil, 3],
-            [547, "maria", "", 3],
-            [548, "maria", nil, 3],
-          ])
+            .should eq([
+          [546, nil, nil, 3],
+          [547, "maria", "", 3],
+          [548, "maria", nil, 3],
+        ])
       end
 
       it "works with UTF8 characters" do
@@ -291,11 +291,10 @@ module MySQL
         conn.query(%{CREATE TABLE people (id INT, name VARCHAR(50), note VARCHAR(50), score INT)})
 
         conn.query(%{INSERT INTO people VALUES(549, "フレーム", "ワークのベンチマーク", 1)})
-        
         conn.query(%{SELECT * FROM people})
-          .should eq([
-            [549,"フレーム", "ワークのベンチマーク", 1],
-          ])
+            .should eq([
+          [549, "フレーム", "ワークのベンチマーク", 1],
+        ])
       end
     end
 
@@ -311,7 +310,7 @@ module MySQL
     end
 
     describe "#transaction" do
-      create_users = -> {
+      create_users = ->{
         conn = connected.call
         conn.query(%{DROP TABLE IF EXISTS user})
         conn.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
