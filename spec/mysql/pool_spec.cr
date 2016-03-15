@@ -9,7 +9,7 @@ module MySQL
     }
 
     subject = ->{
-      described_class.call.new "MyPool", 2, "127.0.0.1", "root", "", "crystal_mysql_test", 3306_u16, nil
+      described_class.call.new "MyPool", 2, "127.0.0.1", "crystal_mysql", "", "crystal_mysql_test", 3306_u16, nil
     }
 
     describe "#initialize & .new" do
