@@ -239,6 +239,19 @@ module MySQL
                      ])
       end
 
+      it "works with blob type" do
+        conn = connected.call
+        conn.query(%{DROP TABLE IF EXISTS data})
+        conn.query(%{CREATE TABLE data (id INT, data blob)})
+
+        MySQL::Query.new(%{INSERT INTO data VALUES(1, :data)}, {"data" => Slice(UInt8).new(10, 1_u8)}).run(conn)
+
+        conn.query(%{SELECT * FROM data})
+            .should eq([
+          [1, Slice(UInt8).new(10, 1_u8)],
+        ])
+      end
+
       it "works with commands" do
         connected.call.query(%{DROP TABLE IF EXISTS user}).should eq(nil)
         connected.call.query(%{CREATE TABLE user (id INT, email VARCHAR(255), name VARCHAR(255))})
@@ -291,7 +304,7 @@ module MySQL
         conn.query(%{CREATE TABLE people (id INT, name VARCHAR(50), note VARCHAR(50), score INT)})
 
         conn.query(%{INSERT INTO people VALUES(549, "フレーム", "ワークのベンチマーク", 1)})
-        
+
         conn.query(%{SELECT * FROM people})
           .should eq([
             [549,"フレーム", "ワークのベンチマーク", 1],

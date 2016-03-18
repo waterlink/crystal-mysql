@@ -127,7 +127,7 @@ conn.close
 
 ## TODO
 
-- Support more types: Enum, Set, Blob, Geometry, Binary strings
+- Support more types: Enum, Set, Geometry, Binary strings
 - Figure out utf-8 (and other collations) support
 - Set up CI for different versions of mysql, ie: 5.5, 5.6, 5.7
 - Set up CI for mac os x

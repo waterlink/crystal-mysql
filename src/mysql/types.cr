@@ -12,7 +12,7 @@ module MySQL
       end
     end
 
-    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date|Bool
+    alias SqlType = String|Time|Int32|Int64|Float64|Nil|Date|Bool|Slice(UInt8)
 
     IGNORE_FIELD_RAW = LibMySQL::MySQLField.new
     IGNORE_FIELD = pointerof(IGNORE_FIELD_RAW)
@@ -58,7 +58,18 @@ module MySQL
       private def lift_down_class(value : Int) Integer end
       private def lift_down_class(value : ::Float) Float end
       private def lift_down_class(value : Time) Datetime end
+      private def lift_down_class(value : Slice(UInt8)) Blob end
       private def lift_down_class(value) Value end
+    end
+
+    struct Blob < Value
+      def _parsed
+        value.to_s.to_slice
+      end
+
+      def to_mysql
+        "'#{String.new(value as Slice(UInt8))}'"
+      end
     end
 
     struct Datetime < Value
@@ -170,6 +181,12 @@ module MySQL
 
       # NULL values
       LibMySQL::MySQLFieldType::MYSQL_TYPE_NULL => Null,
+
+      # BLOB values
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_TINY_BLOB => Blob,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_MEDIUM_BLOB => Blob,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_LONG_BLOB => Blob,
+      LibMySQL::MySQLFieldType::MYSQL_TYPE_BLOB => Blob,
     }
   end
 end
