@@ -39,7 +39,7 @@ module MySQL
                                      flags)
       if handle == @handle
         @connected = true
-      elsif handle.nil?
+      elsif handle.null?
         raise Errors::Connection.new(error)
       else
         raise Errors::Connection.new("Unreachable code")
@@ -114,7 +114,7 @@ module MySQL
 
     private def fetch_row(result, fields)
       row = LibMySQL.fetch_row(result)
-      return nil if row.nil?
+      return nil if row.null?
 
       lengths = lengths_from(result, fields)
       row_list = [] of Types::SqlType
