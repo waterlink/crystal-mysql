@@ -8,10 +8,8 @@ module MySQL
     class UnableToFetchLastInsertId < Base; end
 
     class UnableToRollbackTransaction < Base
-      def initialize(original_error, error)
+      def initialize(@original_error : Exception, @error : Exception)
         super("Unable to rollback")
-        @original_error = original_error
-        @error = error
       end
 
       def to_s
@@ -20,9 +18,8 @@ module MySQL
     end
 
     class Query < Base
-      def initialize(message, query)
+      def initialize(message, @query : String)
         super(message)
-        @query = query
       end
 
       def to_s

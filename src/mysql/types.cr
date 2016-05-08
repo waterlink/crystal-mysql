@@ -1,8 +1,9 @@
 module MySQL
   module Types
-    struct Date
+    class Date
       property time
 
+      @time : Time
       def initialize(time : Time)
         @time = time.date
       end
@@ -17,11 +18,11 @@ module MySQL
     IGNORE_FIELD_RAW = LibMySQL::MySQLField.new
     IGNORE_FIELD = pointerof(IGNORE_FIELD_RAW)
 
-    struct Value
+    class Value
       property value
       property field
 
-      def initialize(@value, @field)
+      def initialize(@value : SqlType, @field : Pointer(LibMySQL::MySQLField))
       end
 
       def initialize(@value)
@@ -62,7 +63,7 @@ module MySQL
       private def lift_down_class(value) Value end
     end
 
-    struct Blob < Value
+    class Blob < Value
       def _parsed
         value.to_s.to_slice
       end
@@ -72,7 +73,7 @@ module MySQL
       end
     end
 
-    struct Datetime < Value
+    class Datetime < Value
       def _parsed
         Time::Format.new("%F %T").parse(value.to_s, Time::Kind::Utc)
       end
@@ -82,13 +83,13 @@ module MySQL
       end
     end
 
-    struct SqlDate < Value
+    class SqlDate < Value
       def _parsed
         Time::Format.new("%F").parse(value.to_s)
       end
     end
 
-    struct Integer < Value
+    class Integer < Value
       def _parsed
         value.to_s.to_i
       end
@@ -98,7 +99,7 @@ module MySQL
       end
     end
 
-    struct BigInteger < Value
+    class BigInteger < Value
       def _parsed
         value.to_s.to_i64
       end
@@ -108,7 +109,7 @@ module MySQL
       end
     end
 
-    struct Float < Value
+    class Float < Value
       def _parsed
         value.to_s.to_f
       end
@@ -118,7 +119,7 @@ module MySQL
       end
     end
 
-    struct Bit < Value
+    class Bit < Value
       def _parsed
         parsed_value = 0_i64
         value.to_s.each_char do |char|
@@ -129,7 +130,7 @@ module MySQL
       end
     end
 
-    struct Boolean < Value
+    class Boolean < Value
       def _parsed
         return true if value == "1"
         false
@@ -140,7 +141,7 @@ module MySQL
       end
     end
 
-    struct Null < Value
+    class Null < Value
       def _parsed
         nil
       end

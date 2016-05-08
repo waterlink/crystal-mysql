@@ -5,7 +5,16 @@ module MySQL
 
     PARAM_REGEX = %r{:([a-zA-Z_0-9]+)}
 
-    def initialize(@value, @params={} of Symbol => MySQL::Types::SqlType)
+    @params : Hash(String, MySQL::Types::SqlType)
+    def initialize(
+      @value : String,
+      params = {} of String => MySQL::Types::SqlType
+    )
+      @params = {} of String => MySQL::Types::SqlType
+      params.each do |key, value|
+        @params[key] = value
+      end
+
       require_params!
     end
 
@@ -19,6 +28,7 @@ module MySQL
       connection.query(to_mysql)
     end
 
+    @_required_params : Array(String)?
     private def required_params
       @_required_params ||= @value.scan(PARAM_REGEX).map { |m| m[1] }
     end
