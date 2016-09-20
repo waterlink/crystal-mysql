@@ -69,7 +69,7 @@ module MySQL
       end
 
       def to_mysql
-        "'#{String.new(value as Slice(UInt8))}'"
+        "'#{String.new(value : Slice(UInt8))}'"
       end
     end
 
@@ -79,7 +79,7 @@ module MySQL
       end
 
       def to_mysql
-        %{'#{(value as Time).to_utc.to_s("%F %T")}'}
+        %{'#{(value : Time).to_utc.to_s("%F %T")}'}
       end
     end
 
