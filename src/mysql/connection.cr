@@ -21,7 +21,7 @@ module MySQL
     end
 
     def set_option(option : LibMySQL::MySQLOption, value)
-      result = LibMySQL.options(@handle, option, value as Void*)
+      result = LibMySQL.options(@handle, option, value.as Void*)
       raise Errors::Connection.new(error) unless result
       result
     end
