@@ -111,6 +111,57 @@ module MySQL
 
       rows
     end
+  
+    # @non-threadsafe!
+    def hashed_query(query_string)
+      unless @connected
+        raise Errors::NotConnected.new
+      end
+
+      code = LibMySQL.query(@handle, query_string.to_unsafe)
+      raise Errors::Query.new(error, query_string) if code != 0
+      result = LibMySQL.store_result(@handle)
+      return nil if result.null?
+
+      column_name_occurences = {} of String => Int32
+
+      fields = [] of LibMySQL::MySQLField*
+      while field = LibMySQL.fetch_field(result)
+        col_name = String.new(field.value.name, field.value.name_length)
+        column_name_occurences[col_name] ||= 0
+        column_name_occurences[col_name] += 1
+        fields << field
+      end
+
+      rows = [] of Array(Types::SqlType)
+      while row = fetch_row(result, fields)
+        rows << row
+      end
+
+      column_names = [] of String
+      fields.each do |field|
+        col_name = String.new(field.value.name, field.value.name_length)
+        if column_name_occurences[col_name] > 1
+          # must prepend the table name because the column name is ambiguous
+          table_name = String.new(field.value.table, field.value.table_length)
+          col_name = "#{table_name}.#{col_name}"
+        end
+        column_names << col_name
+      end
+
+      hashed_rows = rows.map_with_index do |row, i|
+        hash = {} of String => Types::SqlType
+        row.each_with_index do |value, j|
+          column_name = column_names[j]
+          hash[column_name] = value
+        end
+        hash
+      end
+
+      LibMySQL.free_result(result)
+
+      hashed_rows
+    end
 
     private def fetch_row(result, fields)
       row = LibMySQL.fetch_row(result)
